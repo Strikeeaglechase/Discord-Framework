@@ -1,0 +1,23 @@
+{
+	"name": "strike-discord-framework",
+	"version": "1.4.6",
+	"description": "A simple lightweight framework meant to allow rapid development of discord bots",
+	"main": "dist/app.js",
+	"type": "module",
+	"types": "dist/app.d.ts",
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1"
+	},
+	"author": "Strikeeaglechase",
+	"license": "ISC",
+	"dependencies": {
+		"discord.js": "^13.0.0-dev.d6c43a5.1625918569",
+		"mongodb": "^3.6.5",
+		"reflect-metadata": "^0.1.13"
+	},
+	"devDependencies": {
+		"@types/mongodb": "^3.6.10",
+		"@types/node": "^14.14.35",
+		"dotenv": "^8.2.0"
+	}
+}
