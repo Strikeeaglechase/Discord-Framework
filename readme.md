@@ -1,6 +1,7 @@
 strike-discord-framework is a simple, lightweight command and permission framework for Discord.js
 
 # Setup
+
 ```ts
 const framework = new Framework(opts);
 await framework.init();
@@ -39,6 +40,7 @@ In order to load default commands use the `loadBotCommands` method with a path p
 The following default commands are loadable:
 
 #### Default Commands
+
 - misc
 	- help - Uses the `help` object on commands to show user help
 	- ping - A simple ping-pong command to show the bot is running
@@ -56,6 +58,7 @@ framework.loadBotCommands(`${process.cwd()}/node_modules/strike-discord-framewor
 # Commands
 
 ## Command folder structure
+
 Within your commands folder, you should have multiple sub directories for each category of command. The above shows the commands and how they are arranged. There is a second type of command called "MultiCommand" that allows for a set of commands that fall under the same parent command, for the above `perm` is a multi command so the folder structure looks like this
 - misc
 	- help.ts
@@ -73,6 +76,7 @@ Within your commands folder, you should have multiple sub directories for each c
 `perm` is a multicomamnd as there is a `perm.ts` file within it. Multi-commands are defined by having a file, with the same name as the folder in it. xxx/xxx.ts = multi command. All other files within the folder will be counted as child commands of the multi-command
 
 ## Command
+
 To create a command, place a file within the commands directory. `commands/category_name/filename.ts`
 The file should have a default export, that is a class that extends the `Command`
 The command class has the following structure
@@ -88,6 +92,7 @@ abstract class Command {
 }
 ```
 ### BotCommandReturn
+
 BotCommandReturn can either be void, or a `Sendable`. It can also be a promise of either of those.
 ```ts
 type Sendable = string | Discord.MessageEmbed | { embeds: Discord.MessageEmbed[] };
@@ -113,6 +118,7 @@ check(event: CommandEvent): MultiCommandRet | Promise<MultiCommandRet>
 All other commands of a multi-command should be just regular multi-commands. If the base command cannot be executed for whatever reason (DM when DMs are set to false, no permissions, etc) then the child command will not be ran
 
 ### MultiCommandRet
+
 An object with the following structure
 ```ts
 {
@@ -163,6 +169,7 @@ String and number arguments can have specific restrictions applied to them using
 	- `options` - Strictly sets what values are valid, is an array of possibilities
 
 ### Example
+
 Get a number greater than 5, and optionally get a string thats either "hello" or "world"
 ```ts
 class MyCommand{
@@ -174,9 +181,11 @@ class MyCommand{
 
 
 # Utilities
+
 All utilities are accessed via `framework.utils`, which will contain several utility methods
 
 ### Display Id
+
 `framework.utils.displayId(id: string, guild?: Discord.Guild, opts?: DisplayIdOpts)`
 
 Formats a discord Id to be human readable
@@ -188,6 +197,7 @@ opts | DisplayIdOpts | an object with the booleans `includeTypePrefix` and `incl
 returns | Promise\<string> | The formatted user-friendly string that describes the Id
 
 ### Parse Quotes
+
 `framework.utils.parseQuotes(str: string)`
 
 Takes in a string, and splits the string into parts based off spaces and grouped by quotes
@@ -197,6 +207,7 @@ str | string | Input string
 returns | string[] | Array of the split and parsed strings
 
 ### React Confirm
+
 `framework.utils.reactConfirm(prompt: string, message: Discord.Message, opts?: ConfirmOptions)`
 
 Gets a confirm/cancel action from the user
@@ -218,6 +229,7 @@ interface ConfirmOptions {
 ```
 
 ### Resolve User
+
 `framework.utils.resolveUser(resolvable: string, guild?: Discord.Guild)`
 
 Attemptes to resolve a Discord.User from a string, by id, name, and nickname
@@ -228,6 +240,7 @@ guild | Discord.Guild | Optional to help with the resolotion
 returns | Promise\<Discord.User> | Returns the user that was found. WIll be null if none found
 
 ## User input helpers
+
 There are four primary methods to get user input, those are
 - getString - Gets a single message from the user and returns its content 
 - getSelect - Creates a drop down select and gets N number of options from it
@@ -235,6 +248,7 @@ There are four primary methods to get user input, those are
 - getButtonSelect - Creates a message with buttons, and allows the user to press multiple buttons
 
 ### getString
+
 Argument | type | Description
 - | - | -
 message| Discord.Message| The message from the user to target user and channel
@@ -242,6 +256,7 @@ prompt| Discord.MessageEmbed| The embed to send as the prompt
 returns | Promise\<string>| the user entered value
 
 ### getSelect
+
 Argument | type | Description
 - | - | -
 message| Discord.Message| The message from the user to target user and channel
@@ -261,6 +276,7 @@ interface SelectOption {
 ```
 
 ### getButton
+
 Argument | type | Description
 - | - | -
 message| Discord.Message| The message from the user to target user and channel
@@ -280,6 +296,7 @@ interface ButtonOption {
 ```
 
 ### getButtonSelect
+
 Argument | type | Description
 - | - | -
 message| Discord.Message| The message from the user to target user and channel
@@ -300,6 +317,7 @@ interface ButtonSelectOption {
 
 
 ## Paged Embeds
+
 There are two types of paged embeds, `NamedPageEmbed` or `NumberedPageEmbed`, where named uses string indexs selected by the user, and numbered uses sequential numeric indexs.
 
 There are two methods used to construct these classes, and they have near identical siguatures
@@ -334,6 +352,7 @@ type NumberedPage = (existing: Discord.MessageEmbed, index: number) => Discord.M
 
 
 # Object Builder
+
 `framework.utils.objectBuilder<Obj>(display: DisplayFunc, message: Discord.Message, questions: Question[])`
 Argument | type | Description
 - | - | -
@@ -361,6 +380,7 @@ interface BaseQuestion {
 - `QuestionType.button` (`ButtonQuestion`) - Promopts the user to press a button, with the options being defined in an `options` property that should be of type `ButtonOption[]`. Uses the `getButton` util
 
 ### Ask One Question
+
 `ObjectBuilder.askOneQuestion(obj: Obj)`
 
 Asks a single question from the user, where they can select the question they would like to answer. If the user presses exit then the method will return null
@@ -372,6 +392,7 @@ returns | Promise\<Obj> | The modified object (may be null)
 
 
 ### Ask all questions
+
 `ObjectBuilder.askAllQuestions(obj: Partial<Obj> = {})`
 
 Asks the users all questions sequentially and builds up the object from that
