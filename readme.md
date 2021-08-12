@@ -189,33 +189,33 @@ All utilities are accessed via `framework.utils`, which will contain several uti
 `framework.utils.displayId(id: string, guild?: Discord.Guild, opts?: DisplayIdOpts)`
 
 Formats a discord Id to be human readable
-Argument | type | Description
-- | - | -
-id | string |  The Id that will be displayed, can be a user, member, channel, role, or server Id
-guild | Discord.Guild? | The context of the Id for formatting as a ping or raw string
-opts | DisplayIdOpts | an object with the booleans `includeTypePrefix` and `includeID`
-returns | Promise\<string> | The formatted user-friendly string that describes the Id
+|Argument | type | Description|
+|- | - | -|
+|id | string |  The Id that will be displayed, can be a user, member, channel, role, or server Id|
+|guild | Discord.Guild? | The context of the Id for formatting as a ping or raw string|
+|opts | DisplayIdOpts | an object with the booleans `includeTypePrefix` and `includeID`|
+|returns | Promise\<string> | The formatted user-friendly string that describes the Id|
 
 ### Parse Quotes
 
 `framework.utils.parseQuotes(str: string)`
 
 Takes in a string, and splits the string into parts based off spaces and grouped by quotes
-Argument | type | Description
-- | - | -
-str | string | Input string
-returns | string[] | Array of the split and parsed strings
+|Argument | type | Description|
+|- | - | -|
+|str | string | Input string|
+|returns | string[] | Array of the split and parsed strings|
 
 ### React Confirm
 
 `framework.utils.reactConfirm(prompt: string, message: Discord.Message, opts?: ConfirmOptions)`
 
 Gets a confirm/cancel action from the user
-Argument | type | Description
-- | - | -
-promot | string | Thing to ask the user to confirm
-message | Discord.Message | Message from the user, used to target specific user and channel
-opts | ConfirmOptions | Optional set of options to configure how the framework should respond to the input
+|Argument | type | Description|
+|- | - | -|
+|promot | string | Thing to ask the user to confirm|
+|message | Discord.Message | Message from the user, used to target specific user and channel|
+|opts | ConfirmOptions | Optional set of options to configure how the framework should respond to the input|
 
 `ConfirmOptions` has the following structure, every property is optional
 ```ts
@@ -233,11 +233,11 @@ interface ConfirmOptions {
 `framework.utils.resolveUser(resolvable: string, guild?: Discord.Guild)`
 
 Attemptes to resolve a Discord.User from a string, by id, name, and nickname
-Argument | type | Description
-- | - | -
-resolvable |string| String to try to resolve to a user
-guild | Discord.Guild | Optional to help with the resolotion
-returns | Promise\<Discord.User> | Returns the user that was found. WIll be null if none found
+|Argument | type | Description|
+|- | - | -|
+|resolvable |string| String to try to resolve to a user|
+|guild | Discord.Guild | Optional to help with the resolotion|
+|returns | Promise\<Discord.User> | Returns the user that was found. WIll be null if none found|
 
 ## User input helpers
 
@@ -249,21 +249,21 @@ There are four primary methods to get user input, those are
 
 ### getString
 
-Argument | type | Description
-- | - | -
-message| Discord.Message| The message from the user to target user and channel
-prompt| Discord.MessageEmbed| The embed to send as the prompt
-returns | Promise\<string>| the user entered value
+|Argument | type | Description|
+|- | - | -|
+|message| Discord.Message| The message from the user to target user and channel|
+|prompt| Discord.MessageEmbed| The embed to send as the prompt|
+|returns | Promise\<string>| the user entered value|
 
 ### getSelect
 
-Argument | type | Description
-- | - | -
-message| Discord.Message| The message from the user to target user and channel
-prompt| Discord.MessageEmbed| The embed to send as the prompt
-options| SelectOption[]| The selection options
-values| number = 1| How many values for the user to enter, defaults to one
-returns | Promise\<string[]>| the user selected value(s)
+|Argument | type | Description|
+|- | - | -|
+|message| Discord.Message| The message from the user to target user and channel|
+|prompt| Discord.MessageEmbed| The embed to send as the prompt|
+|options| SelectOption[]| The selection options|
+|values| number = 1| How many values for the user to enter, defaults to one|
+|returns | Promise\<string[]>| the user selected value(s)|
 
 `SelectOption` has the structure
 ```ts
@@ -277,12 +277,12 @@ interface SelectOption {
 
 ### getButton
 
-Argument | type | Description
-- | - | -
-message| Discord.Message| The message from the user to target user and channel
-prompt| Discord.MessageEmbed| The embed to send as the prompt
-options| ButtonOption[]| The button options
-returns | Promise\<string>| the value of the button the user pressed
+|Argument | type | Description|
+|- | - | -|
+|message| Discord.Message| The message from the user to target user and channel|
+|prompt| Discord.MessageEmbed| The embed to send as the prompt|
+|options| ButtonOption[]| The button options|
+|returns | Promise\<string>| the value of the button the user pressed|
 
 `ButtonOption` has the structure
 ```ts
@@ -297,12 +297,12 @@ interface ButtonOption {
 
 ### getButtonSelect
 
-Argument | type | Description
-- | - | -
-message| Discord.Message| The message from the user to target user and channel
-prompt| Discord.MessageEmbed| The embed to send as the prompt
-options| ButtonSelectOption[]| The button options
-returns | Promise\<void>| 
+|Argument | type | Description|
+|- | - | -|
+|message| Discord.Message| The message from the user to target user and channel|
+|prompt| Discord.MessageEmbed| The embed to send as the prompt|
+|options| ButtonSelectOption[]| The button options|
+|returns | Promise\<void>| 
 
 `ButtonSelectOption` has the structure
 ```ts
@@ -322,13 +322,13 @@ There are two types of paged embeds, `NamedPageEmbed` or `NumberedPageEmbed`, wh
 
 There are two methods used to construct these classes, and they have near identical siguatures
 `framework.utils.namedPageEmbed(message: Discord.Message, base: EmbedCallback, init: EmbedCallback, pages: NamedPage[])`
-Argument | type | Description
-- | - | -
-message| Discord.Message| The message from the user to target user and channel
-base| EmbedCallback | This is the message first sent, where either the controls for moving backwards and forwards are created, or the selection for the named pages is added
-init| EmbedCallback | Creates the initial emebed for the page after an interaction
-pages| NamedPage[] | Array of pages the user can select
-returns | NamedPageEmbed|
+|Argument | type | Description|
+|- | - | -|
+|message| Discord.Message| The message from the user to target user and channel|
+|base| EmbedCallback | This is the message first sent, where either the controls for moving backwards and forwards are created, or the selection for the named pages is added|
+|init| EmbedCallback | Creates the initial emebed for the page after an interaction|
+|pages| NamedPage[] | Array of pages the user can select|
+|returns | NamedPageEmbed|
 
 For a numbered page embed simply replace `NamedPage` with `NumberedPage` and use `framework.utils.numberPageEmbed`
 
@@ -354,12 +354,12 @@ type NumberedPage = (existing: Discord.MessageEmbed, index: number) => Discord.M
 # Object Builder
 
 `framework.utils.objectBuilder<Obj>(display: DisplayFunc, message: Discord.Message, questions: Question[])`
-Argument | type | Description
-- | - | -
-display| DisplayFunc| A function with the following signature `(obj: Object, framework: FrameworkClient, message: Discord.Message) => Discord.MessageEmbed \| Promise<Discord.MessageEmbed>`. This is used by the object builder class to show the user the object being edited
-message| Discord.Message | Used to target the specific user and channel
-questions| Question[] | An array of questions that can be used to modify the object
-returns | ObjectBuilder\<Obj> | An instance of the OjectBuilder class that can be used to modify or create the object
+|Argument | type | Description|
+|- | - | -|
+|display| DisplayFunc| A function with the following signature `(obj: Object, framework: FrameworkClient, message: Discord.Message) => Discord.MessageEmbed \| Promise<Discord.MessageEmbed>`. This is used by the object builder class to show the user the object being edited|
+|message| Discord.Message | Used to target the specific user and channel|
+|questions| Question[] | An array of questions that can be used to modify the object|
+|returns | ObjectBuilder\<Obj> | An instance of the OjectBuilder class that can be used to modify or create the object|
 
 ## ObjectBuilder class
 
@@ -385,10 +385,10 @@ interface BaseQuestion {
 
 Asks a single question from the user, where they can select the question they would like to answer. If the user presses exit then the method will return null
 
-Argument | type | Description
-- | - | -
-obj | Obj | The object that will have a modification preformed, and returned once the user makes the change
-returns | Promise\<Obj> | The modified object (may be null)
+|Argument | type | Description|
+|- | - | -|
+|obj | Obj | The object that will have a modification preformed, and returned once the user makes the change|
+|returns | Promise\<Obj> | The modified object (may be null)|
 
 
 ### Ask all questions
@@ -397,7 +397,7 @@ returns | Promise\<Obj> | The modified object (may be null)
 
 Asks the users all questions sequentially and builds up the object from that
 
-Argument | type | Description
-- | - | -
-obj | Partial\<Obj> | Optional object to start with, useful for default values
-returns | Promise\<Obj> | The created object, may be null if the user exits
+|Argument | type | Description|
+|- | - | -|
+|obj | Partial\<Obj> | Optional object to start with, useful for default values|
+|returns | Promise\<Obj> | The created object, may be null if the user exits|
