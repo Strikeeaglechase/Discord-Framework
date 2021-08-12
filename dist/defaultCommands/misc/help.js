@@ -65,7 +65,6 @@ class Help extends Command {
             framework.utils.namedPageEmbed(message, () => new Discord.MessageEmbed({ title: "Help selection", description: "Selected the help section you would like to view" }), () => new Discord.MessageEmbed({ title: "Loading" }), Object.keys(catagories).map(category => {
                 return {
                     name: category,
-                    emoji: framework.options.helpEmojis[category],
                     get: handleNewHelpSelect
                 };
             }));

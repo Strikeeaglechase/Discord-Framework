@@ -9,7 +9,7 @@ declare class UserRole {
     role: Discord.Role;
     constructor(user: Discord.User, role: Discord.Role);
     get id(): `${bigint}`;
-    get value(): Discord.User | Discord.Role;
+    get value(): Discord.Role | Discord.User;
     get type(): "user" | "role";
 }
 declare type BotCommandArgument = number | string | Discord.Role | Discord.User | Discord.GuildMember | UserRole;

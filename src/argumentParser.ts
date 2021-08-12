@@ -47,8 +47,11 @@ class ArgumentParser {
 		if (!args) return [];
 		const parsedProms = args.map(async argument => {
 			const input = event.args[argument.index];
-			if (input == undefined && (Array.isArray(argument.options) || !argument.options?.optional)) {
-				throw new Error("Non-optional argument left blank");
+			if (input == undefined) {
+				if (Array.isArray(argument.options) || !argument.options?.optional) {
+					throw new Error("Non-optional argument left blank");
+				}
+				return null;
 			}
 			const value = await this.parseArg(input, event, argument);
 			return value;
@@ -96,7 +99,7 @@ class ArgumentParser {
 	}
 	private getString(input: string, index: number, options: ArgumentOptions) {
 		if (Array.isArray(options)) {
-			assert(options.includes(input.toLowerCase()), `"${input}" is not a valid value for argument ${index}`);
+			assert(options.includes(input?.toLowerCase()), `"${input}" is not a valid value for argument ${index}`);
 			return input;
 		}
 		if (options?.options) assert(options?.options.includes(input.toLowerCase()), `"${input}" is not a valid value for argument ${index}`);

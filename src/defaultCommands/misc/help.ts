@@ -52,7 +52,6 @@ class Help extends Command {
 			Object.keys(catagories).map(category => {
 				return {
 					name: category,
-					emoji: framework.options.helpEmojis[category],
 					get: handleNewHelpSelect
 				}
 			})

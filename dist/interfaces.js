@@ -11,6 +11,5 @@ const defaultFrameworkOpts = {
         intents: Object.keys(Intents.FLAGS),
         partials: ["CHANNEL"]
     },
-    helpEmojis: {}
 };
 export { defaultFrameworkOpts, };

@@ -29,7 +29,6 @@ interface FrameworkClientOptions {
     permErrorSilently?: boolean;
     dmErrorSilently?: boolean;
     clientOptions?: ClientOptions;
-    helpEmojis?: Record<string, string>;
 }
 declare const defaultFrameworkOpts: Partial<FrameworkClientOptions>;
 interface DatabaseOptions {
