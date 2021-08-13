@@ -11,7 +11,7 @@ import { UtilityManager } from "./util/utilManager.js";
 import { FrameworkClientOptions, EmbedOptions, defaultFrameworkOpts } from "./interfaces.js";
 import { BotCommand, Sendable, CommandEvent, MultiCommand, BotCommandArgument } from "./command.js";
 import { ConfigManager } from "./configManager.js";
-export type MessageChannel = Discord.TextChannel | Discord.DMChannel | Discord.NewsChannel | Discord.ThreadChannel;
+export type MessageChannel = Discord.TextChannel | Discord.DMChannel | Discord.NewsChannel | Discord.ThreadChannel | Discord.PartialDMChannel;
 class FrameworkClient {
 	public client: Discord.Client;
 	public botCommands: BotCommand[];

@@ -20,9 +20,8 @@ function resolveUser(framework, resolvable, guild) {
             if (inGuild)
                 return inGuild;
         }
-        const guilds = framework.client.guilds.cache.array();
-        for (let guild of guilds) {
-            const inGuild = yield checkGuild(resolvable, guild);
+        for (let guild of framework.client.guilds.cache) {
+            const inGuild = yield checkGuild(resolvable, guild[1]);
             if (inGuild)
                 return inGuild;
         }

@@ -125,7 +125,7 @@ class ArgumentParser {
 		const role = event.message.guild?.roles.cache.get(id as Discord.Snowflake);
 		if (role) return role;
 		assert(!!event.message.guild, `To specify a role run the command in the server the role exists`);
-		const roleByName = searchForValue(event.message.guild.roles.cache.array(), "name", input);
+		const roleByName = searchForValue([...event.message.guild.roles.cache.values()], "name", input);
 		assert(!!roleByName, `Cannot find role from "${input}"`);
 		return roleByName;
 	}
@@ -135,7 +135,7 @@ class ArgumentParser {
 		// If user wasn't able to resolve by that, do a name resolve
 		const members = await event.message.guild?.members.fetch().catch(() => { });
 		assert(!!members, `Unable to resolve user from "${input}"`);
-		const member = this.findMember(members.array(), input);
+		const member = this.findMember([...members.values()], input);
 		assert(!!member, `Unable to resolve user from "${input}"`);
 		return member;
 	}

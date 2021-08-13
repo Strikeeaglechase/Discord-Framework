@@ -42,8 +42,7 @@ function displayID(client, guild, idAsString, opts = defaultOpts) {
                 return `${serverPrefix} ${guildResolve.name} ${posteFix}`;
             }
         }
-        const guilds = client.guilds.cache.array();
-        const guildResolve = guilds.find((g) => g.id == id);
+        const guildResolve = client.guilds.cache.find((g) => g.id == id);
         if (guildResolve)
             return ret(guildResolve);
         const channel = yield client.channels.fetch(id).catch(IGNORE);
@@ -56,7 +55,7 @@ function displayID(client, guild, idAsString, opts = defaultOpts) {
         if (userObj)
             return ret(userObj);
         let role;
-        for (const checkGuild of guilds) {
+        for (const [, checkGuild] of client.guilds.cache) {
             if (!checkGuild)
                 continue;
             const r = yield checkGuild.roles.fetch(id).catch(IGNORE);

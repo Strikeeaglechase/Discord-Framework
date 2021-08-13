@@ -11,9 +11,8 @@ async function resolveUser(framework: FrameworkClient, resolvable: string, guild
 		const inGuild = await checkGuild(resolvable, guild);
 		if (inGuild) return inGuild;
 	}
-	const guilds = framework.client.guilds.cache.array();
-	for (let guild of guilds) {
-		const inGuild = await checkGuild(resolvable, guild);
+	for (let guild of framework.client.guilds.cache) {
+		const inGuild = await checkGuild(resolvable, guild[1]);
 		if (inGuild) return inGuild;
 	}
 }

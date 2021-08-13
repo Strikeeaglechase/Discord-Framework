@@ -11,7 +11,7 @@
 	"author": "Strikeeaglechase",
 	"license": "ISC",
 	"dependencies": {
-		"discord.js": "^13.0.0-dev.d6c43a5.1625918569",
+		"discord.js": "^13.1.0",
 		"mongodb": "^3.6.5",
 		"reflect-metadata": "^0.1.13"
 	},

@@ -8,7 +8,7 @@ declare class UserRole {
     user: Discord.User;
     role: Discord.Role;
     constructor(user: Discord.User, role: Discord.Role);
-    get id(): `${bigint}`;
+    get id(): string;
     get value(): Discord.Role | Discord.User;
     get type(): "user" | "role";
 }

@@ -69,14 +69,14 @@ class PermissionManager {
             if (!this.tracks.get(userId)) {
                 this.tracks.set(userId, new Map());
             }
-            const guilds = this.framework.client.guilds.cache.array();
+            const guilds = this.framework.client.guilds.cache;
             const roles = [];
             const proms = guilds.map((guild) => __awaiter(this, void 0, void 0, function* () {
                 if (this.tracks.get(userId).get(guild.id))
                     return; // If the guild flag is set, this user isnt in the server
                 const member = yield guild.members.fetch(userId).catch(() => { });
                 if (member)
-                    member.roles.cache.array().forEach(r => roles.push(r.id));
+                    member.roles.cache.forEach(r => roles.push(r.id));
                 else
                     this.tracks.get(userId).set(guild.id, true); // Set guild flag
             }));

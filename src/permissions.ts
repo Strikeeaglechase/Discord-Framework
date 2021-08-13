@@ -56,12 +56,12 @@ class PermissionManager {
 		if (!this.tracks.get(userId)) {
 			this.tracks.set(userId, new Map());
 		}
-		const guilds = this.framework.client.guilds.cache.array();
+		const guilds = this.framework.client.guilds.cache;
 		const roles: string[] = [];
 		const proms = guilds.map(async guild => {
 			if (this.tracks.get(userId).get(guild.id)) return; // If the guild flag is set, this user isnt in the server
 			const member = await guild.members.fetch(userId as Discord.Snowflake).catch(() => { });
-			if (member) member.roles.cache.array().forEach(r => roles.push(r.id));
+			if (member) member.roles.cache.forEach(r => roles.push(r.id));
 			else this.tracks.get(userId).set(guild.id, true) // Set guild flag
 		});
 		await Promise.all(proms);

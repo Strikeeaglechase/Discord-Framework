@@ -9,6 +9,7 @@ type ConfirmOptions = Partial<{
 	onConfirm: () => Sendable | Promise<Sendable>;
 	onCancel: () => Sendable | Promise<Sendable>;
 }>;
+
 async function confirm(prompt: string, channel: MessageChannel, userId: string, opts: ConfirmOptions = {}) {
 	const emb = new Discord.MessageEmbed();
 	emb.setDescription(prompt);

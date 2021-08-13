@@ -35,8 +35,7 @@ async function displayID(client: Discord.Client, guild: Discord.Guild, idAsStrin
 		}
 	}
 
-	const guilds = client.guilds.cache.array();
-	const guildResolve = guilds.find((g) => g.id == id);
+	const guildResolve = client.guilds.cache.find((g) => g.id == id);
 	if (guildResolve) return ret(guildResolve);
 
 	const channel = await client.channels.fetch(id).catch(IGNORE) as Discord.TextChannel;
@@ -50,7 +49,7 @@ async function displayID(client: Discord.Client, guild: Discord.Guild, idAsStrin
 
 
 	let role: Discord.Role;
-	for (const checkGuild of guilds) {
+	for (const [, checkGuild] of client.guilds.cache) {
 		if (!checkGuild) continue;
 		const r = await checkGuild.roles.fetch(id).catch(IGNORE);
 		if (r) {
