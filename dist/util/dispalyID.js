@@ -23,9 +23,10 @@ function displayID(client, guild, idAsString, opts = defaultOpts) {
         const unknownPrefix = opts.includeTypePrefix ? "**Unknown:**" : "";
         const posteFix = opts.includeID ? `(${id})` : "";
         function ret(resolve) {
+            var _a;
             const inGuild = !(resolve instanceof Discord.User) &&
                 !(resolve instanceof Discord.Guild) &&
-                guild && resolve.guild.id == guild.id;
+                guild && ((_a = resolve.guild) === null || _a === void 0 ? void 0 : _a.id) == guild.id;
             if (resolve instanceof Discord.GuildChannel) {
                 return inGuild ? `${channelPrefix} <#${id}> ${posteFix}` : `${channelPrefix} ${resolve.name} ${posteFix}`;
             }

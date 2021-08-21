@@ -20,7 +20,7 @@ async function displayID(client: Discord.Client, guild: Discord.Guild, idAsStrin
 	function ret(resolve: Discord.GuildChannel | Discord.Role | Discord.User | Discord.GuildMember | Discord.Guild): string {
 		const inGuild = !(resolve instanceof Discord.User) &&
 			!(resolve instanceof Discord.Guild) &&
-			guild && resolve.guild.id == guild.id;
+			guild && resolve.guild?.id == guild.id;
 
 		if (resolve instanceof Discord.GuildChannel) {
 			return inGuild ? `${channelPrefix} <#${id}> ${posteFix}` : `${channelPrefix} ${resolve.name} ${posteFix}`;
