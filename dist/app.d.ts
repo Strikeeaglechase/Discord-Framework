@@ -1,13 +1,13 @@
 import "reflect-metadata";
-import Discord from "discord.js";
 import "./set.js";
+import Discord from "discord.js";
+import { BotCommand, MultiCommand, Sendable } from "./command.js";
+import { ConfigManager } from "./configManager.js";
 import Database from "./database.js";
+import { FrameworkClientOptions } from "./interfaces.js";
 import Logger from "./logger.js";
 import { PermissionManager } from "./permissions.js";
 import { UtilityManager } from "./util/utilManager.js";
-import { FrameworkClientOptions } from "./interfaces.js";
-import { BotCommand, Sendable, MultiCommand } from "./command.js";
-import { ConfigManager } from "./configManager.js";
 export declare type MessageChannel = Discord.TextChannel | Discord.DMChannel | Discord.NewsChannel | Discord.ThreadChannel | Discord.PartialDMChannel;
 declare class FrameworkClient {
     client: Discord.Client;

@@ -1,16 +1,19 @@
 // This file is the main entry point for my custom framework wrapper around discord.js
 import "reflect-metadata";
+import "./set.js";
+
 import Discord from "discord.js";
 import fs from "fs";
-import "./set.js";
-import Database from "./database.js";
-import Logger from "./logger.js"
-import { PermissionManager } from "./permissions.js";
-import { Arg, ArgumentParser } from "./argumentParser.js";
-import { UtilityManager } from "./util/utilManager.js";
-import { FrameworkClientOptions, EmbedOptions, defaultFrameworkOpts } from "./interfaces.js";
-import { BotCommand, Sendable, CommandEvent, MultiCommand, BotCommandArgument } from "./command.js";
+
+import { ArgumentParser } from "./argumentParser.js";
+import { BotCommand, BotCommandArgument, CommandEvent, MultiCommand, Sendable } from "./command.js";
 import { ConfigManager } from "./configManager.js";
+import Database from "./database.js";
+import { defaultFrameworkOpts, EmbedOptions, FrameworkClientOptions } from "./interfaces.js";
+import Logger from "./logger.js";
+import { PermissionManager } from "./permissions.js";
+import { UtilityManager } from "./util/utilManager.js";
+
 export type MessageChannel = Discord.TextChannel | Discord.DMChannel | Discord.NewsChannel | Discord.ThreadChannel | Discord.PartialDMChannel;
 class FrameworkClient {
 	public client: Discord.Client;

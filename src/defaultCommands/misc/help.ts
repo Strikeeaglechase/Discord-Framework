@@ -1,7 +1,9 @@
 import Discord from "discord.js";
+
 // import { Page } from "../../util/pagedEmbed.js";
 import { isMultiCommand } from "../../app.js";
 import { BotCommand, Command, CommandEvent } from "../../command.js";
+
 class Help extends Command {
 	name = "help";
 	help = {
@@ -34,8 +36,8 @@ class Help extends Command {
 			emb.setTitle(`**Help for ${name}**`);
 			emb.fields = [];
 			commands.forEach(command => {
-				const idx = command.category.indexOf(".", 2);
-				let prename = command.category.substring(idx > -1 ? idx + 1 : command.category.length);
+				const idx = command.category.lastIndexOf(".");
+				let prename = command.category.substring(idx + 1, command.category.length);
 				if (prename.length > 0) prename += " ";
 				if (!command.help.usage) {
 					emb.addField(`${prefix}${prename}${command.name}  ${command.help.msg}`, `\u200E`);

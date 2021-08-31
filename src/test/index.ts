@@ -1,6 +1,8 @@
-import { FrameworkClientOptions } from "../interfaces.js";
-import Framework from "../app.js";
 import { config as dotconfig } from "dotenv";
+
+import Framework from "../app.js";
+import { FrameworkClientOptions } from "../interfaces.js";
+
 dotconfig();
 const opts: FrameworkClientOptions = {
 	commandsPath: `${process.cwd()}/commands/`,
@@ -26,7 +28,7 @@ const framework = new Framework(opts);
 async function run() {
 	const app = new App(5);
 	await framework.init(app);
-	framework.loadBotCommands(`${process.cwd()}/../defaultCommands/`);
+	await framework.loadBotCommands(`${process.cwd()}/../defaultCommands/`);
 }
 run();
 export { App }

@@ -9,17 +9,17 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 // This file is the main entry point for my custom framework wrapper around discord.js
 import "reflect-metadata";
+import "./set.js";
 import Discord from "discord.js";
 import fs from "fs";
-import "./set.js";
-import Database from "./database.js";
-import Logger from "./logger.js";
-import { PermissionManager } from "./permissions.js";
 import { ArgumentParser } from "./argumentParser.js";
-import { UtilityManager } from "./util/utilManager.js";
-import { defaultFrameworkOpts } from "./interfaces.js";
 import { CommandEvent } from "./command.js";
 import { ConfigManager } from "./configManager.js";
+import Database from "./database.js";
+import { defaultFrameworkOpts } from "./interfaces.js";
+import Logger from "./logger.js";
+import { PermissionManager } from "./permissions.js";
+import { UtilityManager } from "./util/utilManager.js";
 class FrameworkClient {
     constructor(opts) {
         this.overrides = [];

@@ -7,8 +7,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-import Framework from "../app.js";
 import { config as dotconfig } from "dotenv";
+import Framework from "../app.js";
 dotconfig();
 const opts = {
     commandsPath: `${process.cwd()}/commands/`,
@@ -34,7 +34,7 @@ function run() {
     return __awaiter(this, void 0, void 0, function* () {
         const app = new App(5);
         yield framework.init(app);
-        framework.loadBotCommands(`${process.cwd()}/../defaultCommands/`);
+        yield framework.loadBotCommands(`${process.cwd()}/../defaultCommands/`);
     });
 }
 run();

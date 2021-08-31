@@ -49,8 +49,8 @@ class Help extends Command {
                 emb.setTitle(`**Help for ${name}**`);
                 emb.fields = [];
                 commands.forEach(command => {
-                    const idx = command.category.indexOf(".", 2);
-                    let prename = command.category.substring(idx > -1 ? idx + 1 : command.category.length);
+                    const idx = command.category.lastIndexOf(".");
+                    let prename = command.category.substring(idx + 1, command.category.length);
                     if (prename.length > 0)
                         prename += " ";
                     if (!command.help.usage) {
