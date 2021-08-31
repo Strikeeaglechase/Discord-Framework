@@ -51,6 +51,8 @@ class Help extends Command {
                 commands.forEach(command => {
                     const idx = command.category.lastIndexOf(".");
                     let prename = command.category.substring(idx + 1, command.category.length);
+                    if (!(command.parent && isMultiCommand(command.parent)))
+                        prename = "";
                     if (prename.length > 0)
                         prename += " ";
                     if (!command.help.usage) {
