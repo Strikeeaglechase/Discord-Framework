@@ -1,7 +1,8 @@
 import Discord from "discord.js";
-import { BotCommandArgument, Command, CommandEvent, UserRole } from "./command.js";
+
 import FrameworkClient from "./app.js";
 import { assert } from "./assert.js";
+import { BotCommandArgument, Command, CommandEvent, UserRole } from "./command.js";
 
 type StringKeyOf<T, K extends keyof T = keyof T> = K extends K ? T[K] extends string ? K : never : never;
 type Constructor<T> = new (...args: any[]) => T;
@@ -16,7 +17,7 @@ function Arg(opts?: ArgumentOptions) {
 	return function (target: Command, propertyKey: string | symbol, parameterIndex: number) {
 		const meta: CommandArgument[] = Reflect.getMetadata("design:paramtypes", target, propertyKey);
 		ArgumentParser.instance.handleNewArg(target.constructor as Constructor<Command>, [meta[parameterIndex]], parameterIndex, opts);
-	}
+	};
 }
 interface ArgumentOptionsObject {
 	max: number,
@@ -103,7 +104,7 @@ class ArgumentParser {
 			return input;
 		}
 		if (options?.options) assert(options?.options.includes(input.toLowerCase()), `"${input}" is not a valid value for argument ${index}`);
-		if (options.regex instanceof RegExp) { assert(options.regex.test(input), `"${input}" is invalid here`) }
+		if (options.regex instanceof RegExp) { assert(options.regex.test(input), `"${input}" is invalid here`); }
 		return input;
 	}
 	private async getUser(input: string, event: CommandEvent) {
@@ -143,7 +144,7 @@ class ArgumentParser {
 		if (new RegExp(/<@!?\d+>/).test(input)) {
 			return new RegExp(/\d+/g).exec(input)[0];
 		} else {
-			return input
+			return input;
 		}
 	}
 	private findMember(members: Discord.GuildMember[], search: string) {
@@ -168,4 +169,5 @@ function searchForValue<T, K extends StringKeyOf<T>>(arr: Array<T>, key: K, sear
 	if (includes) return includes;
 	return null;
 }
-export { Arg, CommandRun, ArgumentParser }
+
+export { Arg, CommandRun, ArgumentParser };

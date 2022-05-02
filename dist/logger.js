@@ -7,8 +7,11 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-import fs from "fs";
+// This implements a level based logger that logs data to:
+// - stdout
+// - a log file split by day
 import { Util } from "discord.js";
+import fs from "fs";
 const path = "./logs/";
 const LOG_TIME = 1000;
 class Logger {
@@ -36,7 +39,7 @@ class Logger {
             if (!this.readyToBotLog) {
                 return setTimeout(this.boundLogToBot, LOG_TIME);
             }
-            // Loop through all buffered messages and orginize them by channel
+            // Loop through all buffered messages and organize them by channel
             const channelSorted = {};
             this.buffer.forEach(message => {
                 const channelID = this.options.logChannels[message.level];

@@ -186,9 +186,10 @@ class FrameworkClient {
             this.handleCommand(commandStr, message);
         });
     }
-    handleCommand(commandString, message, commandsList = this.botCommands, event) {
+    handleCommand(commandString, message, commandsList = this.botCommands, event, cmdDpth = 1) {
         var _a, _b;
         return __awaiter(this, void 0, void 0, function* () {
+            // console.log(`CMD STR: ${commandString}`);
             const command = commandsList.find((botCommand) => {
                 const nameList = Array.isArray(botCommand.altNames) ?
                     botCommand.altNames.concat([botCommand.name]) :
@@ -210,10 +211,13 @@ class FrameworkClient {
                 const hasPerm = yield this.checkUserPerm(command, message);
                 if (!hasPerm)
                     return;
+                // console.log(" - " + command.name + ": " + isMultiCommand(command));
                 if (isMultiCommand(command)) {
-                    const subCommandStr = (_a = message.content.split(" ")[1]) === null || _a === void 0 ? void 0 : _a.toLowerCase();
+                    const subCommandStr = (_a = message.content.split(" ")[cmdDpth]) === null || _a === void 0 ? void 0 : _a.toLowerCase();
+                    // console.log(` - Sub cmd str: ${subCommandStr} (${command.name})`);
                     if (!subCommandStr || subCommandStr == command.name || ((_b = command.altNames) === null || _b === void 0 ? void 0 : _b.includes(subCommandStr)))
                         return yield this.execCommand(command, message);
+                    // console.log(` - ${command.subCommands.map(c => c.name).join(", ")}`);
                     let envt = event ? event : new CommandEvent(this, message, this.userApp, command);
                     // envt.command = command;
                     if (command.check) {
@@ -223,7 +227,7 @@ class FrameworkClient {
                         }
                         envt = subCheck.event;
                     }
-                    yield this.handleCommand(subCommandStr, message, command.subCommands, envt);
+                    yield this.handleCommand(subCommandStr, message, command.subCommands, envt, cmdDpth + 1);
                 }
                 else {
                     if (event)

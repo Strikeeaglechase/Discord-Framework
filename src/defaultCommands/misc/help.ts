@@ -37,17 +37,26 @@ class Help extends Command {
 			emb.fields = [];
 			commands.forEach(command => {
 				const idx = command.category.lastIndexOf(".");
-				let prename = command.category.substring(idx + 1, command.category.length);
+				// let prename = command.category.substring(idx + 1, command.category.length);
+
+				const prenames = [];
+				let parent = command.parent;
+				while (parent) {
+					prenames.push(parent.name);
+					parent = parent.parent;
+				}
+				let prename = prenames.reverse().join(" ");
+
 				if (!(command.parent && isMultiCommand(command.parent))) prename = "";
 				if (prename.length > 0) prename += " ";
-				if (!command.help.usage) {
-					emb.addField(`${prefix}${prename}${command.name}  ${command.help.msg}`, `\u200E`);
+				if (!command.help.usage && command.help.msg) {
+					emb.addField(`${prefix}${prename}${command.name} ${command.help.msg}`, `\u200E`);
 				} else if (command.help.msg) {
 					emb.addField(`${prefix}${prename}${command.name} ${command.help.usage}`, command.help.msg);
 				}
 			});
 			return emb;
-		}
+		};
 		framework.utils.namedPageEmbed(
 			message,
 			() => new Discord.MessageEmbed({ title: "Help selection", description: "Selected the help section you would like to view" }),
@@ -56,7 +65,7 @@ class Help extends Command {
 				return {
 					name: category,
 					get: handleNewHelpSelect
-				}
+				};
 			})
 		);
 	}

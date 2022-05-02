@@ -1,6 +1,11 @@
+import {
+	Collection, DeleteWriteOpResultObject, FilterQuery, InsertOneWriteOpResult, OptionalId,
+	UpdateWriteOpResult, WithId
+} from "mongodb";
+
 // This file defines a manager wrapper around mongoDB "Collections", they allow custom ID type/prop names
 import Database from "./database.js";
-import { Collection, DeleteWriteOpResultObject, FilterQuery, InsertOneWriteOpResult, OptionalId, UpdateWriteOpResult, WithId } from "mongodb";
+
 interface Encoder<DataType, SerializedData> {
 	toDb: (obj: DataType) => SerializedData;
 	fromDb: (obj: SerializedData) => DataType;
@@ -53,7 +58,7 @@ class CollectionManager<IDType, DataType> implements DBStorage<IDType, DataType>
 	}
 	// Either returns all items, or one item by ID from the collection
 	async get(): Promise<DataType[]>;
-	async get(id: IDType): Promise<DataType>
+	async get(id: IDType): Promise<DataType>;
 	async get(id?: IDType): Promise<DataType | DataType[]> {
 		if (!id) {
 			return await this.collection.find({}).toArray();
@@ -84,7 +89,7 @@ class CollectionManager<IDType, DataType> implements DBStorage<IDType, DataType>
 }
 class EncodedCollectionManager<IDType, DataType, SerializedData> implements DBStorage<IDType, DataType> {
 	dbManager: CollectionManager<IDType, SerializedData>;
-	encoder: Encoder<DataType, SerializedData>
+	encoder: Encoder<DataType, SerializedData>;
 	constructor(database: Database, collectionName: string, cache: boolean, idProp: string, encoder: Encoder<DataType, SerializedData>) {
 		this.dbManager = new CollectionManager(database, collectionName, cache, idProp);
 		this.encoder = encoder;
@@ -94,7 +99,7 @@ class EncodedCollectionManager<IDType, DataType, SerializedData> implements DBSt
 	}
 	// Either returns all items, or one item by ID from the collection
 	async get(): Promise<DataType[]>;
-	async get(id: IDType): Promise<DataType>
+	async get(id: IDType): Promise<DataType>;
 	async get(id?: IDType): Promise<DataType | DataType[]> {
 		const item = await this.dbManager.get(id) as SerializedData | SerializedData[];
 		if (Array.isArray(item)) {

@@ -1,12 +1,13 @@
 // This implements a level based logger that logs data to:
 // - stdout
 // - a log file split by day
+import { Client, Snowflake, TextChannel, Util } from "discord.js";
+import fs from "fs";
+
 // - discord channels based off severity
 import { LoggerOptions, LogLevel, LogMessage } from "./interfaces";
-import fs from "fs";
-import { Client, Snowflake, Util } from "discord.js";
-import { TextChannel } from "discord.js";
-const path = "./logs/"
+
+const path = "./logs/";
 const LOG_TIME = 1000;
 interface BufferedLogMessage {
 	level: LogLevel,
@@ -25,7 +26,7 @@ class Logger {
 		info: (message: LogMessage) => void;
 		warn: (message: LogMessage) => void;
 		error: (message: LogMessage) => void;
-	}
+	};
 	constructor(opts: LoggerOptions) {
 		this.options = opts;
 		this.buffer = [];
@@ -34,7 +35,7 @@ class Logger {
 			info: this.info.bind(this),
 			warn: this.warn.bind(this),
 			error: this.error.bind(this),
-		}
+		};
 		this.boundLogToBot = this.logToBot.bind(this);
 		this.boundLogToBot();
 	}
@@ -49,7 +50,7 @@ class Logger {
 		if (!this.readyToBotLog) {
 			return setTimeout(this.boundLogToBot, LOG_TIME);
 		}
-		// Loop through all buffered messages and orginize them by channel
+		// Loop through all buffered messages and organize them by channel
 		const channelSorted = {} as Record<string, BufferedLogMessage[]>;
 		this.buffer.forEach(message => {
 			const channelID = this.options.logChannels[message.level];

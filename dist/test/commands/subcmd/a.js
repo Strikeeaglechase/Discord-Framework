@@ -7,12 +7,11 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-import Discord from "discord.js";
 import { Command } from "../../../command.js";
-class Test extends Command {
+class A extends Command {
     constructor() {
         super(...arguments);
-        this.name = "test";
+        this.name = "a";
         this.help = {
             msg: "This is a help message",
             usage: "<number>",
@@ -21,13 +20,8 @@ class Test extends Command {
     // @CommandRun
     run(event) {
         return __awaiter(this, void 0, void 0, function* () {
-            const options = [
-                { button: { name: "Hello", style: "PRIMARY" }, onSelect: (itr) => { itr.reply(itr.customId); } },
-                { button: { name: "World", style: "PRIMARY" }, onSelect: (itr, edit) => { itr.reply(itr.customId); options[1].button.disabled = true; edit(options); } },
-                { button: { name: "Test", style: "DANGER" }, onSelect: (itr) => { itr.reply(itr.customId); } }
-            ];
-            event.framework.utils.getButtonSelect(event.message, new Discord.MessageEmbed({ title: "Hello World" }), options);
+            return event.framework.success(`SubCmd.A ran`);
         });
     }
 }
-export default Test;
+export default A;

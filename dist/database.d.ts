@@ -1,7 +1,7 @@
+import MongoDBPkg from "mongodb";
+import { CollectionManager, EncodedCollectionManager, Encoder } from "./collectionManager.js";
 import { DatabaseOptions } from "./interfaces.js";
 import Logger from "./logger.js";
-import { CollectionManager, EncodedCollectionManager, Encoder } from "./collectionManager.js";
-import MongoDBPkg from "mongodb";
 declare class Database {
     db: MongoDBPkg.Db;
     log: Logger;

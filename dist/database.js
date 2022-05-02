@@ -7,8 +7,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-import { CollectionManager, EncodedCollectionManager } from "./collectionManager.js";
 import MongoDBPkg from "mongodb";
+import { CollectionManager, EncodedCollectionManager } from "./collectionManager.js";
 const { MongoClient, } = MongoDBPkg;
 class Database {
     constructor(opts, log) {

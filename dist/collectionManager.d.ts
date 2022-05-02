@@ -1,5 +1,5 @@
-import Database from "./database.js";
 import { Collection, DeleteWriteOpResultObject, FilterQuery, InsertOneWriteOpResult, UpdateWriteOpResult, WithId } from "mongodb";
+import Database from "./database.js";
 interface Encoder<DataType, SerializedData> {
     toDb: (obj: DataType) => SerializedData;
     fromDb: (obj: SerializedData) => DataType;

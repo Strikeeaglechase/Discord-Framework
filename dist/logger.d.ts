@@ -1,7 +1,7 @@
 /// <reference types="node" />
-import { LoggerOptions, LogLevel, LogMessage } from "./interfaces";
-import fs from "fs";
 import { Client } from "discord.js";
+import fs from "fs";
+import { LoggerOptions, LogLevel, LogMessage } from "./interfaces";
 interface BufferedLogMessage {
     level: LogLevel;
     header: string;

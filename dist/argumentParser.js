@@ -8,8 +8,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 import Discord from "discord.js";
-import { UserRole } from "./command.js";
 import { assert } from "./assert.js";
+import { UserRole } from "./command.js";
 function CommandRun(target, propertyKey, descriptor) {
     const meta = Reflect.getMetadata("design:paramtypes", target, propertyKey);
     for (let i = 1; i < meta.length; i++) {

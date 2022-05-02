@@ -1,9 +1,10 @@
+import MongoDBPkg from "mongodb";
+
+import { CollectionManager, EncodedCollectionManager, Encoder } from "./collectionManager.js";
 // This file defines a 'database' class which is a wrapper around the MongoDB database
 import { DatabaseOptions } from "./interfaces.js";
 import Logger from "./logger.js";
-import { CollectionManager, EncodedCollectionManager, Encoder } from "./collectionManager.js";
 
-import MongoDBPkg from "mongodb";
 const {
 	MongoClient,
 } = MongoDBPkg;

@@ -116,7 +116,7 @@ class FrameworkClient {
 	}
 	private async fetchBotCommands(path: string, catTag: string = ""): Promise<BotCommand[]> {
 		const files = fs.readdirSync(path);
-		this.log.info(`Found files in ${path.substring(path.lastIndexOf('/', path.length - 2))} folder: ${files.join(", ")}`)
+		this.log.info(`Found files in ${path.substring(path.lastIndexOf('/', path.length - 2))} folder: ${files.join(", ")}`);
 		const commandsImports: Array<Promise<BotCommand | BotCommand[]>> = files.map(async file => {
 			if (fs.statSync(path + file).isDirectory()) {
 				const newTag = catTag + "." + file;
@@ -126,7 +126,7 @@ class FrameworkClient {
 				if (base) {
 					base.subCommands = subcommands;
 					subcommands.forEach(sc => {
-						if (sc != base) sc.parent = base
+						if (sc != base) sc.parent = base;
 					});
 					return base;
 				} else {
@@ -137,7 +137,7 @@ class FrameworkClient {
 				if (!file.endsWith(".d.ts")) this.log.warn(`Command file ${path + file} does not end with ".js" thus will be omitted for import`);
 				return null;
 			}
-			const imported: { default: new () => BotCommand } = await import("file://" + path + file);
+			const imported: { default: new () => BotCommand; } = await import("file://" + path + file);
 			const command = new imported.default();
 			command.category = catTag;
 			return command;
@@ -180,11 +180,12 @@ class FrameworkClient {
 		}
 		this.handleCommand(commandStr, message);
 	}
-	private async handleCommand(commandString: string, message: Discord.Message, commandsList = this.botCommands, event?: CommandEvent) {
+	private async handleCommand(commandString: string, message: Discord.Message, commandsList = this.botCommands, event?: CommandEvent, cmdDpth = 1) {
+		// console.log(`CMD STR: ${commandString}`);
 		const command: BotCommand = commandsList.find((botCommand) => {
 			const nameList = Array.isArray(botCommand.altNames) ?
 				botCommand.altNames.concat([botCommand.name]) :
-				[botCommand.name]
+				[botCommand.name];
 			return nameList.includes(commandString);
 		});
 		if (!command) {
@@ -201,10 +202,12 @@ class FrameworkClient {
 			this.logCommand(message);
 			const hasPerm = await this.checkUserPerm(command, message);
 			if (!hasPerm) return;
+			// console.log(" - " + command.name + ": " + isMultiCommand(command));
 			if (isMultiCommand(command)) {
-				const subCommandStr = message.content.split(" ")[1]?.toLowerCase();
+				const subCommandStr = message.content.split(" ")[cmdDpth]?.toLowerCase();
+				// console.log(` - Sub cmd str: ${subCommandStr} (${command.name})`);
 				if (!subCommandStr || subCommandStr == command.name || command.altNames?.includes(subCommandStr)) return await this.execCommand(command, message);
-
+				// console.log(` - ${command.subCommands.map(c => c.name).join(", ")}`);
 				let envt = event ? event : new CommandEvent(this, message, this.userApp, command);
 				// envt.command = command;
 				if (command.check) {
@@ -214,7 +217,7 @@ class FrameworkClient {
 					}
 					envt = subCheck.event;
 				}
-				await this.handleCommand(subCommandStr, message, command.subCommands, envt);
+				await this.handleCommand(subCommandStr, message, command.subCommands, envt, cmdDpth + 1);
 			} else {
 				if (event) event.updateCommand(command); // Event may have started as a sub-command, so make sure this is correct
 				await this.execCommand(command, message, event);
@@ -342,7 +345,7 @@ function toDiscordSendable(msg: Sendable): DiscordSendable {
 	if (typeof msg == "string") {
 		return { content: msg };
 	} else if (msg instanceof Discord.MessageEmbed) {
-		return { embeds: [msg] }
+		return { embeds: [msg] };
 	} else {
 		return msg;
 	}
@@ -351,4 +354,4 @@ function isMultiCommand(command: BotCommand): command is MultiCommand {
 	return (command as MultiCommand).subCommands != undefined;
 }
 export default FrameworkClient;
-export { sendMessage, isMultiCommand, toDiscordSendable, DiscordSendable }
+export { sendMessage, isMultiCommand, toDiscordSendable, DiscordSendable };
