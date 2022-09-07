@@ -62,6 +62,15 @@ abstract class MultiCommand extends Command {
 	}
 }
 
+/**
+ * The event object for a command.
+ * @param command The command that was run.
+ * @param app The app.
+ * @param framework A reference to the Framework
+ * @param message The message that triggered the command.
+ * @param args The arguments for the command. [NOTE: TEXT-BASED COMMANDS ONLY]
+ * @param interaction The interaction that triggered the command. [NOTE: SLASH COMMANDS ONLY]
+ */
 class CommandEvent<T = any> {
 	command: BotCommand;
 	app: T;

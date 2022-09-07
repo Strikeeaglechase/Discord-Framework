@@ -17,7 +17,7 @@ class Slash extends Command {
         }
     ]; // this can be left out, default = []
 
-    // @CommandRu
+    // Run when the command is called.
     async run(event: CommandEvent) {
         const {framework, interaction} = event;
         if(!event.interaction.isCommand()) return; // required bc typescript funni
@@ -34,6 +34,7 @@ class Slash extends Command {
 
     }
 
+    // A quick onConfirm function to work with the reactConfirm function above.
     async onConfirm(event: CommandEvent):Promise<Sendable> {
         let emb = new Discord.MessageEmbed();
         emb.setTitle("Test");
