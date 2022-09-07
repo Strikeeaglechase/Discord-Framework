@@ -26,7 +26,7 @@ class Slash extends Command {
             }
         ]; // this can be left out, default = []
     }
-    // @CommandRu
+    // Run when the command is called.
     run(event) {
         return __awaiter(this, void 0, void 0, function* () {
             const { framework, interaction } = event;
@@ -38,6 +38,7 @@ class Slash extends Command {
             });
         });
     }
+    // A quick onConfirm function to work with the reactConfirm function above.
     onConfirm(event) {
         return __awaiter(this, void 0, void 0, function* () {
             let emb = new Discord.MessageEmbed();

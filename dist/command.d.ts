@@ -9,18 +9,18 @@ declare class UserRole {
     role: Discord.Role;
     constructor(user: Discord.User, role: Discord.Role);
     get id(): string;
-    get value(): Discord.Role | Discord.User;
+    get value(): Discord.User | Discord.Role;
     get type(): "user" | "role";
 }
 /**
  * Type for Slash Command Options.
  */
-declare type SlashCommandOption = {
+interface SlashCommandOption {
     name: string;
     description: string;
     type: Discord.ApplicationCommandOptionType;
     required?: boolean;
-};
+}
 declare type BotCommandArgument = number | string | Discord.Role | Discord.User | Discord.GuildMember | UserRole;
 declare type BotCommandFunc = (event: CommandEvent, ...args: BotCommandArgument[]) => BotCommandReturn;
 interface MultiCommandRet {
@@ -52,6 +52,15 @@ declare abstract class MultiCommand extends Command {
     };
     check(event: CommandEvent): MultiCommandRet | Promise<MultiCommandRet>;
 }
+/**
+ * The event object for a command.
+ * @param command The command that was run.
+ * @param app The app.
+ * @param framework A reference to the Framework
+ * @param message The message that triggered the command.
+ * @param args The arguments for the command. [NOTE: TEXT-BASED COMMANDS ONLY]
+ * @param interaction The interaction that triggered the command. [NOTE: SLASH COMMANDS ONLY]
+ */
 declare class CommandEvent<T = any> {
     command: BotCommand;
     app: T;

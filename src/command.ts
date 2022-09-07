@@ -15,7 +15,7 @@ class UserRole {
 /**
  * Type for Slash Command Options.
  */
-type SlashCommandOption = {
+interface SlashCommandOption {
 	name: string;
 	description: string;
 	type: Discord.ApplicationCommandOptionType;
