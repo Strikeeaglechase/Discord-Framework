@@ -29,6 +29,7 @@ abstract class Command {
 	parent: BotCommand = null;
 	altNames: string[] = [];
 	help: { msg?: string; usage?: string; } = {}
+	slashCommand: boolean = false;
 	noPermError(event: CommandEvent, ...args: BotCommandArgument[]): BotCommandReturn {
 		return event.framework.error("You do not have the required permissions");
 	}
@@ -55,9 +56,10 @@ class CommandEvent<T = any> {
 	framework: FrameworkClient;
 	message: Discord.Message;
 	args: string[];
+	interaction?: Discord.CommandInteraction;
 	constructor(frameworkOrEvent: CommandEvent)
 	constructor(frameworkOrEvent: FrameworkClient, message: Discord.Message, app: T, command: BotCommand)
-	constructor(frameworkOrEvent: FrameworkClient | CommandEvent, message?: Discord.Message, app?: T, command?: BotCommand) {
+	constructor(frameworkOrEvent: FrameworkClient | CommandEvent, message?: Discord.Message, app?: T, command?: BotCommand, interaction?: Discord.CommandInteraction) {
 		if (frameworkOrEvent instanceof CommandEvent) {
 			this.framework = frameworkOrEvent.framework;
 			this.message = frameworkOrEvent.message;
@@ -68,6 +70,7 @@ class CommandEvent<T = any> {
 			this.message = message;
 			this.app = app;
 			this.command = command;
+			this.interaction = interaction;
 		}
 		this.updateCommand(this.command);
 	}

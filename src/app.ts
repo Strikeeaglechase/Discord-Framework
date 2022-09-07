@@ -224,6 +224,9 @@ class FrameworkClient {
 			}
 		}
 	}
+	private async handleSlashCommand(interaction: Discord.CommandInteraction) {
+
+	}
 	private async execCommand(command: BotCommand, message: Discord.Message, event?: CommandEvent) {
 		try {
 			// Execute the command and if there is a return output it
