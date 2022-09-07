@@ -198,6 +198,12 @@ class FrameworkClient {
 			}
 			return;
 		}
+
+		// Check if this command is actually a slash command. If it is, this needs to be aborted since it is a slash command.
+		if(command.slashCommand) {
+			await message.channel.send("This command is a slash command.")
+			return;
+		}
 		if (command) {
 			this.logCommand(message);
 			const hasPerm = await this.checkUserPerm(command, message);

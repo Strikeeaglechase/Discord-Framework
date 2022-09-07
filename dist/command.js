@@ -15,10 +15,13 @@ class Command {
         this.parent = null;
         this.altNames = [];
         this.help = {};
+        this.slashCommand = false;
     }
     noPermError(event, ...args) {
         return event.framework.error("You do not have the required permissions");
     }
+}
+class SlashCommand extends Command {
 }
 class MultiCommand extends Command {
     constructor() {
@@ -37,7 +40,7 @@ class MultiCommand extends Command {
     }
 }
 class CommandEvent {
-    constructor(frameworkOrEvent, message, app, command) {
+    constructor(frameworkOrEvent, message, app, command, interaction) {
         if (frameworkOrEvent instanceof CommandEvent) {
             this.framework = frameworkOrEvent.framework;
             this.message = frameworkOrEvent.message;
@@ -49,6 +52,7 @@ class CommandEvent {
             this.message = message;
             this.app = app;
             this.command = command;
+            this.interaction = interaction;
         }
         this.updateCommand(this.command);
     }
@@ -66,4 +70,4 @@ class CommandEvent {
         this.command = newCommand;
     }
 }
-export { Command, MultiCommand, CommandEvent, UserRole };
+export { Command, SlashCommand, MultiCommand, CommandEvent, UserRole };

@@ -206,6 +206,11 @@ class FrameworkClient {
                 }
                 return;
             }
+            // Check if this command is actually a slash command. If it is, this needs to be aborted since it is a slash command.
+            if (command.slashCommand) {
+                yield message.channel.send("This command is a slash command.");
+                return;
+            }
             if (command) {
                 this.logCommand(message);
                 const hasPerm = yield this.checkUserPerm(command, message);
@@ -235,6 +240,10 @@ class FrameworkClient {
                     yield this.execCommand(command, message, event);
                 }
             }
+        });
+    }
+    handleSlashCommand(interaction) {
+        return __awaiter(this, void 0, void 0, function* () {
         });
     }
     execCommand(command, message, event) {

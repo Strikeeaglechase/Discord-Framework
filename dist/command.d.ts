@@ -9,7 +9,7 @@ declare class UserRole {
     role: Discord.Role;
     constructor(user: Discord.User, role: Discord.Role);
     get id(): string;
-    get value(): Discord.Role | Discord.User;
+    get value(): Discord.User | Discord.Role;
     get type(): "user" | "role";
 }
 declare type BotCommandArgument = number | string | Discord.Role | Discord.User | Discord.GuildMember | UserRole;
@@ -30,8 +30,12 @@ declare abstract class Command {
         msg?: string;
         usage?: string;
     };
+    slashCommand: boolean;
     noPermError(event: CommandEvent, ...args: BotCommandArgument[]): BotCommandReturn;
     abstract run(event: CommandEvent, ...args: BotCommandArgument[]): BotCommandReturn;
+}
+declare abstract class SlashCommand extends Command {
+    abstract run(event: CommandEvent): BotCommandReturn;
 }
 declare abstract class MultiCommand extends Command {
     subCommands: BotCommand[];
@@ -45,11 +49,12 @@ declare class CommandEvent<T = any> {
     command: BotCommand;
     app: T;
     framework: FrameworkClient;
-    message: Discord.Message;
+    message?: Discord.Message;
     args: string[];
+    interaction?: Discord.CommandInteraction;
     constructor(frameworkOrEvent: CommandEvent);
     constructor(frameworkOrEvent: FrameworkClient, message: Discord.Message, app: T, command: BotCommand);
     updateCommand(newCommand: Command): void;
 }
 declare type BotCommand = Command | MultiCommand;
-export { Command, MultiCommand, BotCommandReturn, BotCommandFunc, BotCommand, Sendable, CommandEvent, BotCommandArgument, UserRole };
+export { Command, SlashCommand, MultiCommand, BotCommandReturn, BotCommandFunc, BotCommand, Sendable, CommandEvent, BotCommandArgument, UserRole };

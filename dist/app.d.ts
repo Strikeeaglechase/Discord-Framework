@@ -32,6 +32,7 @@ declare class FrameworkClient {
     private handleMention;
     private handleMessage;
     private handleCommand;
+    private handleSlashCommand;
     private execCommand;
     checkUserPerm(command: BotCommand, message: Discord.Message, hideErrors?: boolean): Promise<boolean>;
     private logCommand;

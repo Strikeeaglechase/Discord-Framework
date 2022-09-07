@@ -36,6 +36,10 @@ abstract class Command {
 	abstract run(event: CommandEvent, ...args: BotCommandArgument[]): BotCommandReturn;
 }
 
+abstract class SlashCommand extends Command {
+	abstract run(event: CommandEvent): BotCommandReturn;
+}
+
 abstract class MultiCommand extends Command {
 	subCommands: BotCommand[] = [];
 	run(event: CommandEvent) {
@@ -54,7 +58,7 @@ class CommandEvent<T = any> {
 	command: BotCommand;
 	app: T;
 	framework: FrameworkClient;
-	message: Discord.Message;
+	message?: Discord.Message;
 	args: string[];
 	interaction?: Discord.CommandInteraction;
 	constructor(frameworkOrEvent: CommandEvent)
@@ -92,6 +96,7 @@ type BotCommand = Command | MultiCommand;
 
 export {
 	Command,
+	SlashCommand,
 	MultiCommand,
 	BotCommandReturn,
 	BotCommandFunc,
