@@ -86,7 +86,9 @@ abstract class Command {
 	allowDM: boolean = true; // If this command can be ran in DMs
 	permissions: string[] = []; // The permission flags this command has
 	altNames: string[] = []; // Alternative names for this command
-	help: { msg?: string; usage?: string; } = {} // A help object used for the help command
+	help: { msg?: string; usage?: string; } = {} // A help object used for the help command. Slash commands re-use this for the description.
+	slashCommand: boolean = false; // Wether or not this is a slash command.
+	slashOptions: SlashCommandOption[] = [] // The arguments for this slash command.
 	noPermError(event: CommandEvent, ...args: BotCommandArgument[]): BotCommandReturn; // An optional method that will be called whenever a user without permissions executes the command
 	abstract run(event: CommandEvent, ...args: BotCommandArgument[]): BotCommandReturn; // (Required) The method that is run when a user executes a command
 }
@@ -128,6 +130,22 @@ An object with the following structure
 }
 ```
 
+## Slash Commands
+
+A Slash command is built right into a regular command! Most of a slash command works just like a regular command, but there are some slight differences to be aware of.
+```ts
+abstract class Command {
+	...
+	slashCommand: Boolean = true // This has to be true to be a slash command
+	slashCommandOptions: SlashCommandOptions = [] // The arguments for this slash command
+	...
+}
+```
+### The differences
+
+A regular command can be run by a text message. These commands can only be run as a slash command. You enable this option by setting `slashCommand` to `true` when creating a `Command`.
+
+
 ## CommandEvent 
 
 Command event is the primary method to interact with the framework when commands execute. The class has the following structure
@@ -136,14 +154,21 @@ class CommandEvent<T = any> {
 	command: BotCommand; // The bot command that this event was triggered by, if its a part of a multi-command this will be the child command that gets executed
 	app: T; // This is the value that was passed into the framework on initialization
 	framework: FrameworkClient; // A reference to the framework instance
-	message: Discord.Message; // The discord message that triggered this command
-	args: string[]; // A list of arguments the user gave, split by spaces, but where anything in quotations will be grouped. hello world "hello world"
+	message: Discord.Message; // The discord message that triggered this command (Only for Text Commands)
+	args: string[]; // A list of arguments the user gave, split by spaces, but where anything in quotations will be grouped. hello world "hello world" (Only for Text Commands)
+	interaction?: Discord.Interaction //If a command is a slash command, it will give you details about the interaction (Only for Slash Commands)
 	constructor(event: CommandEvent); // If you extend the command event class then pass in the original command event to assign the values 
 }
 ```
 
-## Argument Parsing
+### CommandEvent and Slash Commands
 
+CommandEvent has some slight changes when it comes down to a slash command. It will still send the same CommandEvent, however the `message` and `args` fields will be empty. Instead, information about this command can be found in `interaction`. 
+
+## Argument Parsing
+```
+Note: This is only available for text-based commands.
+```
 To use automatic argument parsing there are some pre-requisites that must be completed first
 - `reflect-metadata` is included, and loaded before the framework
 - You are using typescript
@@ -181,6 +206,9 @@ class MyCommand{
 
 
 # Utilities
+```
+Note: Not all utilities are currently compatible with Slash commands.
+```
 
 All utilities are accessed via `framework.utils`, which will contain several utility methods
 
