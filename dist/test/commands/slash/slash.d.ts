@@ -1,4 +1,4 @@
-import { Command, CommandEvent, SlashCommandOption } from "../../../command.js";
+import { Command, CommandEvent, SlashCommandOption, Sendable } from "../../../command.js";
 declare class Slash extends Command {
     name: string;
     help: {
@@ -8,5 +8,6 @@ declare class Slash extends Command {
     slashCommand: boolean;
     slashOptions: SlashCommandOption[];
     run(event: CommandEvent): Promise<void>;
+    onConfirm(event: CommandEvent): Promise<Sendable>;
 }
 export default Slash;

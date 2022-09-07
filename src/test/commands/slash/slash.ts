@@ -1,6 +1,5 @@
-import Discord from "discord.js";
-
-import { Command, CommandEvent, SlashCommandOption } from "../../../command.js";
+import Discord, { CommandInteraction } from "discord.js";
+import { Command, CommandEvent, SlashCommandOption, Sendable } from "../../../command.js";
 import { ButtonSelectOption } from "../../../util/buttonSelects.js";
 
 class Slash extends Command {
@@ -20,9 +19,27 @@ class Slash extends Command {
 
     // @CommandRu
     async run(event: CommandEvent) {
-        if(!event.interaction.isCommand()) return;
-        event.interaction.reply('test!')
+        const {framework, interaction} = event;
+        if(!event.interaction.isCommand()) return; // required bc typescript funni
+        framework.utils.reactConfirm(
+            "test",
+            interaction.channel,
+            interaction.user.id,
+            {
+                onConfirm: () => {return this.onConfirm(event);},
+                onCancel: () => {return "Cancelled"}
+            }
+        );
+
+
     }
+
+    async onConfirm(event: CommandEvent):Promise<Sendable> {
+        let emb = new Discord.MessageEmbed();
+        emb.setTitle("Test");
+        return emb 
+    }
+
 }
 
 export default Slash;
