@@ -9,9 +9,18 @@ declare class UserRole {
     role: Discord.Role;
     constructor(user: Discord.User, role: Discord.Role);
     get id(): string;
-    get value(): Discord.User | Discord.Role;
+    get value(): Discord.Role | Discord.User;
     get type(): "user" | "role";
 }
+/**
+ * Type for Slash Command Options.
+ */
+declare type SlashCommandOption = {
+    name: string;
+    description: string;
+    type: Discord.ApplicationCommandOptionType;
+    required?: boolean;
+};
 declare type BotCommandArgument = number | string | Discord.Role | Discord.User | Discord.GuildMember | UserRole;
 declare type BotCommandFunc = (event: CommandEvent, ...args: BotCommandArgument[]) => BotCommandReturn;
 interface MultiCommandRet {
@@ -30,12 +39,10 @@ declare abstract class Command {
         msg?: string;
         usage?: string;
     };
-    slashCommand: boolean;
+    slashCommand?: boolean;
+    slashOptions?: SlashCommandOption[];
     noPermError(event: CommandEvent, ...args: BotCommandArgument[]): BotCommandReturn;
     abstract run(event: CommandEvent, ...args: BotCommandArgument[]): BotCommandReturn;
-}
-declare abstract class SlashCommand extends Command {
-    abstract run(event: CommandEvent): BotCommandReturn;
 }
 declare abstract class MultiCommand extends Command {
     subCommands: BotCommand[];
@@ -51,10 +58,10 @@ declare class CommandEvent<T = any> {
     framework: FrameworkClient;
     message?: Discord.Message;
     args: string[];
-    interaction?: Discord.CommandInteraction;
+    interaction?: Discord.Interaction;
     constructor(frameworkOrEvent: CommandEvent);
-    constructor(frameworkOrEvent: FrameworkClient, message: Discord.Message, app: T, command: BotCommand);
+    constructor(frameworkOrEvent: FrameworkClient, message: Discord.Message, app: T, command: BotCommand, interaction?: Discord.CommandInteraction);
     updateCommand(newCommand: Command): void;
 }
 declare type BotCommand = Command | MultiCommand;
-export { Command, SlashCommand, MultiCommand, BotCommandReturn, BotCommandFunc, BotCommand, Sendable, CommandEvent, BotCommandArgument, UserRole };
+export { Command, SlashCommandOption, MultiCommand, BotCommandReturn, BotCommandFunc, BotCommand, Sendable, CommandEvent, BotCommandArgument, UserRole };

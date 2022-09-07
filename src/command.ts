@@ -12,6 +12,16 @@ class UserRole {
 	get type() { return this.user ? "user" : "role" }
 }
 
+/**
+ * Type for Slash Command Options.
+ */
+type SlashCommandOption = {
+	name: string;
+	description: string;
+	type: Discord.ApplicationCommandOptionType;
+	required?: boolean;
+}
+
 type BotCommandArgument = number | string | Discord.Role | Discord.User | Discord.GuildMember | UserRole;
 type BotCommandFunc = (event: CommandEvent, ...args: BotCommandArgument[]) => BotCommandReturn;
 
@@ -29,16 +39,14 @@ abstract class Command {
 	parent: BotCommand = null;
 	altNames: string[] = [];
 	help: { msg?: string; usage?: string; } = {}
-	slashCommand: boolean = false;
+	slashCommand?: boolean = false;
+	slashOptions?: SlashCommandOption[] = [];
 	noPermError(event: CommandEvent, ...args: BotCommandArgument[]): BotCommandReturn {
 		return event.framework.error("You do not have the required permissions");
 	}
 	abstract run(event: CommandEvent, ...args: BotCommandArgument[]): BotCommandReturn;
 }
 
-abstract class SlashCommand extends Command {
-	abstract run(event: CommandEvent): BotCommandReturn;
-}
 
 abstract class MultiCommand extends Command {
 	subCommands: BotCommand[] = [];
@@ -60,9 +68,9 @@ class CommandEvent<T = any> {
 	framework: FrameworkClient;
 	message?: Discord.Message;
 	args: string[];
-	interaction?: Discord.CommandInteraction;
+	interaction?: Discord.Interaction;
 	constructor(frameworkOrEvent: CommandEvent)
-	constructor(frameworkOrEvent: FrameworkClient, message: Discord.Message, app: T, command: BotCommand)
+	constructor(frameworkOrEvent: FrameworkClient, message: Discord.Message, app: T, command: BotCommand, interaction?: Discord.CommandInteraction)
 	constructor(frameworkOrEvent: FrameworkClient | CommandEvent, message?: Discord.Message, app?: T, command?: BotCommand, interaction?: Discord.CommandInteraction) {
 		if (frameworkOrEvent instanceof CommandEvent) {
 			this.framework = frameworkOrEvent.framework;
@@ -79,7 +87,8 @@ class CommandEvent<T = any> {
 		this.updateCommand(this.command);
 	}
 	updateCommand(newCommand: Command) {
-		this.args = this.framework.utils.parseQuotes(this.message.content);
+		// This is now required as slash commands do not ship a message object.
+		if(this.message) this.args = this.framework.utils.parseQuotes(this.message.content);
 		// Remove non-
 		let parent = newCommand.parent;
 		let deapth = 0;
@@ -96,7 +105,7 @@ type BotCommand = Command | MultiCommand;
 
 export {
 	Command,
-	SlashCommand,
+	SlashCommandOption,
 	MultiCommand,
 	BotCommandReturn,
 	BotCommandFunc,

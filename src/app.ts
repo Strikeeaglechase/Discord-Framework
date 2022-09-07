@@ -6,7 +6,7 @@ import Discord from "discord.js";
 import fs from "fs";
 
 import { ArgumentParser } from "./argumentParser.js";
-import { BotCommand, BotCommandArgument, CommandEvent, MultiCommand, Sendable } from "./command.js";
+import { BotCommand, BotCommandArgument, CommandEvent, MultiCommand, Sendable, Command } from "./command.js";
 import { ConfigManager } from "./configManager.js";
 import Database from "./database.js";
 import { defaultFrameworkOpts, EmbedOptions, FrameworkClientOptions } from "./interfaces.js";
@@ -18,6 +18,7 @@ export type MessageChannel = Discord.TextChannel | Discord.DMChannel | Discord.N
 class FrameworkClient {
 	public client: Discord.Client;
 	public botCommands: BotCommand[];
+	public slashCommands: BotCommand[];
 	public database: Database;
 	public permissions: PermissionManager;
 	public log: Logger;
@@ -41,6 +42,7 @@ class FrameworkClient {
 		this.config = new ConfigManager(this);
 		ArgumentParser.instance.framework = this;
 		this.botCommands = [];
+		this.slashCommands = [];
 		// Setup the awaitable promises
 		this.botReady = new Promise((resolve) => this.botReadyResolve = resolve);
 	}
@@ -91,6 +93,13 @@ class FrameworkClient {
 		this.client.on("guildMemberAdd", (member) => {
 			this.permissions.clearUserTracks(member.id);
 		});
+
+		// Listens for slash command interactions. If received, handle it.
+		this.client.on("interactionCreate", async (interaction) => {
+			if(!interaction.isCommand()) return;
+			await this.handleSlashCommand(interaction);
+
+		});
 	}
 	// Gets the files in whatever path points to, and iterates over all the js files to be loaded as commands
 	// Mask enforces only specific files are loaded (useful for defaults)
@@ -101,6 +110,8 @@ class FrameworkClient {
 			return mask.some(maskName => command.name == maskName);
 		});
 		this.botCommands = this.botCommands.concat(masked);
+
+
 		const perms: Set<string> = new Set();
 		function assignPerms(command: BotCommand) {
 			command.permissions.push("command" + command.category + "." + command.name);
@@ -112,8 +123,28 @@ class FrameworkClient {
 			}
 		}
 		this.botCommands.forEach(assignPerms);
+		this.slashCommands.forEach(assignPerms);
 		this.permissions.loadPerms([...perms]);
 	}
+
+	/**
+	 * Load a slash command. This is a separate method from loadBotCommands because it is a different type of command.
+	 * @param command The command to register
+	 * @returns void
+	 */
+	private async loadSlashCommand(command: BotCommand) {
+		// Create the command data
+		const data = {
+			name: command.name,
+			description: command.help.msg,
+			options: command.slashOptions
+		};
+		// Register the command
+		await this.client.application?.commands.create(data);
+		this.log.info("Registered slash command " + command.name);
+		return;
+	}
+	
 	private async fetchBotCommands(path: string, catTag: string = ""): Promise<BotCommand[]> {
 		const files = fs.readdirSync(path);
 		this.log.info(`Found files in ${path.substring(path.lastIndexOf('/', path.length - 2))} folder: ${files.join(", ")}`);
@@ -143,6 +174,22 @@ class FrameworkClient {
 			return command;
 		});
 		const imported = await Promise.all(commandsImports);
+
+		// Loop over all command and verify if one of them is a slash command.
+		// If a command is one, it is moved to the slashCommands array and removed from the imported array.
+		// Then, it will register itself as a slash command.
+		imported.forEach(async element => {
+			if(element instanceof Command) {
+				if(element.slashCommand) {
+					await this.loadSlashCommand(element);
+
+					// Yes, I am doing this on this and yes, this is not a good idea. It just gotta work now.
+					this.slashCommands.push(element);
+					imported.splice(imported.indexOf(element), 1);
+				}
+			}
+
+		});
 		return imported.filter(obj => obj != null).flat() as BotCommand[];
 	}
 	// Handles the bot being mentioned, we want to tell the user what the prefix is in case they don't know it
@@ -230,8 +277,22 @@ class FrameworkClient {
 			}
 		}
 	}
+	
+	/**
+	 * Handle the execution of a Slash Command.
+	 * @param interaction The interaction that was received.
+	 * @returns void
+	 */
 	private async handleSlashCommand(interaction: Discord.CommandInteraction) {
+		let commandName = interaction.commandName.toLowerCase();
+		let command:Command = this.slashCommands.find(cmd => cmd.name.toLowerCase() == commandName);
 
+		if(!command) this.error("Somehow this command does not exist..");
+		if(this.checkUserPermSlash(command, interaction)) {
+			const event = new CommandEvent(this,null, this.userApp, command, interaction);
+			await command.run(event);
+		}
+		return;
 	}
 	private async execCommand(command: BotCommand, message: Discord.Message, event?: CommandEvent) {
 		try {
@@ -252,6 +313,24 @@ class FrameworkClient {
 			this.log.error(`Error running command ${command.name}`);
 			this.log.error(e);
 		}
+	}
+
+	/**
+	 * Check to see if a user has permissions to run a Slash Command.
+	 * @param command The command to check
+	 * @param interaction The interaction provided by the command
+	 * @returns Does user have permissions to run this command?
+	 */
+	public async checkUserPermSlash(command: Command, interaction: Discord.CommandInteraction):Promise<boolean> {
+		let hasPerm = false;
+		for (let perm of command.permissions) {
+			if (await this.permissions.check(interaction.user.id, perm)) {
+				hasPerm = true;
+				break;
+			}
+		}
+		return hasPerm;
+		
 	}
 	public async checkUserPerm(command: BotCommand, message: Discord.Message, hideErrors = false): Promise<boolean> {
 		if (command.name == "override" && message.author.id == this.options.ownerID) return true;

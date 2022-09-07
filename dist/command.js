@@ -16,12 +16,11 @@ class Command {
         this.altNames = [];
         this.help = {};
         this.slashCommand = false;
+        this.slashOptions = [];
     }
     noPermError(event, ...args) {
         return event.framework.error("You do not have the required permissions");
     }
-}
-class SlashCommand extends Command {
 }
 class MultiCommand extends Command {
     constructor() {
@@ -57,7 +56,9 @@ class CommandEvent {
         this.updateCommand(this.command);
     }
     updateCommand(newCommand) {
-        this.args = this.framework.utils.parseQuotes(this.message.content);
+        // This is now required as slash commands do not ship a message object.
+        if (this.message)
+            this.args = this.framework.utils.parseQuotes(this.message.content);
         // Remove non-
         let parent = newCommand.parent;
         let deapth = 0;
@@ -70,4 +71,4 @@ class CommandEvent {
         this.command = newCommand;
     }
 }
-export { Command, SlashCommand, MultiCommand, CommandEvent, UserRole };
+export { Command, MultiCommand, CommandEvent, UserRole };
