@@ -139,6 +139,18 @@ class FrameworkClient {
             return;
         });
     }
+    /**
+     * Deletes all commands from this application. Can be toggled on with `slashCommandReset` in the FrameworkOptions.
+     * @returns void
+     */
+    deleteSlashCommands() {
+        var _a;
+        return __awaiter(this, void 0, void 0, function* () {
+            yield ((_a = this.client.application) === null || _a === void 0 ? void 0 : _a.commands.set([]));
+            this.log.info("Deleted all slash commands");
+            return;
+        });
+    }
     fetchBotCommands(path, catTag = "") {
         return __awaiter(this, void 0, void 0, function* () {
             const files = fs.readdirSync(path);
@@ -171,6 +183,11 @@ class FrameworkClient {
                 return command;
             }));
             const imported = yield Promise.all(commandsImports);
+            // Check to see if we are forced to reset all slash commands.
+            // This can be useful in the event a bad command got registered and needs to be removed.
+            if (this.options.slashCommandReset) {
+                yield this.deleteSlashCommands();
+            }
             // Loop over all command and verify if one of them is a slash command.
             // If a command is one, it is moved to the slashCommands array and removed from the imported array.
             // Then, it will register itself as a slash command.

@@ -28,6 +28,7 @@ interface FrameworkClientOptions {
 	defaultPrefix: string;
 	databaseOpts: DatabaseOptions;
 
+	slashCommandReset?: boolean;
 	loggerOpts?: LoggerOptions;
 	ownerID?: string;
 	dmPrefixOnPing?: boolean;

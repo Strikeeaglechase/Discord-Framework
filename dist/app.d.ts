@@ -35,6 +35,11 @@ declare class FrameworkClient {
      * @returns void
      */
     private loadSlashCommand;
+    /**
+     * Deletes all commands from this application. Can be toggled on with `slashCommandReset` in the FrameworkOptions.
+     * @returns void
+     */
+    private deleteSlashCommands;
     private fetchBotCommands;
     private handleMention;
     private handleMessage;

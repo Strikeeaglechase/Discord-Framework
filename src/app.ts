@@ -122,6 +122,7 @@ class FrameworkClient {
 				});
 			}
 		}
+		
 		this.botCommands.forEach(assignPerms);
 		this.slashCommands.forEach(assignPerms);
 		this.permissions.loadPerms([...perms]);
@@ -142,6 +143,16 @@ class FrameworkClient {
 		// Register the command
 		await this.client.application?.commands.create(data);
 		this.log.info("Registered slash command " + command.name);
+		return;
+	}
+
+	/**
+	 * Deletes all commands from this application. Can be toggled on with `slashCommandReset` in the FrameworkOptions.
+	 * @returns void
+	 */
+	private async deleteSlashCommands() {
+		await this.client.application?.commands.set([]);
+		this.log.info("Deleted all slash commands");
 		return;
 	}
 	
@@ -174,6 +185,12 @@ class FrameworkClient {
 			return command;
 		});
 		const imported = await Promise.all(commandsImports);
+
+		// Check to see if we are forced to reset all slash commands.
+		// This can be useful in the event a bad command got registered and needs to be removed.
+		if (this.options.slashCommandReset) {
+			await this.deleteSlashCommands();
+		}
 
 		// Loop over all command and verify if one of them is a slash command.
 		// If a command is one, it is moved to the slashCommands array and removed from the imported array.

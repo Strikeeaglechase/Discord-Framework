@@ -27,6 +27,7 @@ interface FrameworkClientOptions {
 	permErrorSilently: boolean; // (Optional) If permission errors should be quietly ignored, rather then sending the user an error
 	dmErrorSilently: boolean; // (Optional) If the bot should tell users that they cannot run that command in DMs when its set as such
 	clientOptions: ClientOptions; // (Optional) Discord client options, passed directly to DJS. Its highly recommend you set this as otherwise the intents are set to everything
+	slashCommandReset: boolean // (Optional) Removed all slash commands from your application. Can be useful if you registered a bad command. (Only for Slash Commands)
 }
 ```
 
@@ -108,6 +109,9 @@ The type for automatic argument parsing: `number | string | Discord.Role | Disco
 - type - Either "user" or "role"
 
 ## Multi-Command
+```
+Note: Multi-Command is not available with Slash commands.
+```
 
 The `MultiCommand` class extends the Command class. All sub commands are refrenced via the primary command, such as when the user runs a command it has the following syntax:
 
@@ -143,7 +147,7 @@ abstract class Command {
 ```
 ### The differences
 
-A regular command can be run by a text message. These commands can only be run as a slash command. You enable this option by setting `slashCommand` to `true` when creating a `Command`.
+A regular command can be run by a text message. These commands can only be run as a slash command. You enable this option by setting `slashCommand` to `true` when creating a `Command`. They also get a slightly different `CommandEvent` object compared to a text-command. More on that below.
 
 
 ## CommandEvent 
