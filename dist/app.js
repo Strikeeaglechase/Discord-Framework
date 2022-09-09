@@ -309,8 +309,9 @@ class FrameworkClient {
         return __awaiter(this, void 0, void 0, function* () {
             let commandName = interaction.commandName.toLowerCase();
             let command = this.slashCommands.find(cmd => cmd.name.toLowerCase() == commandName);
+            // If by some weird reason a slash command is executed that is not registered, we need to abort it and send an error message.
             if (!command)
-                this.error("Somehow this command does not exist..");
+                (interaction.reply({ content: "This command does not exist.", ephemeral: true }));
             if (this.checkUserPermSlash(command, interaction)) {
                 const event = new CommandEvent(this, null, this.userApp, command, interaction);
                 yield command.run(event);
