@@ -23,6 +23,7 @@ interface FrameworkClientOptions {
     commandsPath: string;
     defaultPrefix: string;
     databaseOpts: DatabaseOptions;
+    slashCommandReset?: boolean;
     loggerOpts?: LoggerOptions;
     ownerID?: string;
     dmPrefixOnPing?: boolean;

@@ -27,6 +27,7 @@ interface FrameworkClientOptions {
 	permErrorSilently: boolean; // (Optional) If permission errors should be quietly ignored, rather then sending the user an error
 	dmErrorSilently: boolean; // (Optional) If the bot should tell users that they cannot run that command in DMs when its set as such
 	clientOptions: ClientOptions; // (Optional) Discord client options, passed directly to DJS. Its highly recommend you set this as otherwise the intents are set to everything
+	slashCommandReset: boolean // (Optional) Removed all slash commands from your application. Can be useful if you registered a bad command. (Only for Slash Commands)
 }
 ```
 
@@ -86,7 +87,9 @@ abstract class Command {
 	allowDM: boolean = true; // If this command can be ran in DMs
 	permissions: string[] = []; // The permission flags this command has
 	altNames: string[] = []; // Alternative names for this command
-	help: { msg?: string; usage?: string; } = {} // A help object used for the help command
+	help: { msg?: string; usage?: string; } = {} // A help object used for the help command. Slash commands re-use this for the description.
+	slashCommand: boolean = false; // Wether or not this is a slash command.
+	slashOptions: SlashCommandOption[] = [] // The arguments for this slash command.
 	noPermError(event: CommandEvent, ...args: BotCommandArgument[]): BotCommandReturn; // An optional method that will be called whenever a user without permissions executes the command
 	abstract run(event: CommandEvent, ...args: BotCommandArgument[]): BotCommandReturn; // (Required) The method that is run when a user executes a command
 }
@@ -106,6 +109,9 @@ The type for automatic argument parsing: `number | string | Discord.Role | Disco
 - type - Either "user" or "role"
 
 ## Multi-Command
+```
+Note: Multi-Command is not available with Slash commands.
+```
 
 The `MultiCommand` class extends the Command class. All sub commands are refrenced via the primary command, such as when the user runs a command it has the following syntax:
 
@@ -127,6 +133,39 @@ An object with the following structure
 	failMessage: Sendable; // If pass is set to false, this will be sent to the user
 }
 ```
+## Slash Commands
+
+A Slash command is built right into a regular command! Most of a slash command works just like a regular command, but there are some slight differences to be aware of.
+```ts
+abstract class Slashcommand extends Command {
+	... // All other properties are the same as a regular command
+	slashCommandOptions: SlashCommandOptions = [] // The arguments for this slash command
+}
+```
+
+Slash commands are an extention of regular commands. The major difference is that they do not work as text-based commands but can only be invoked using a `/` in Discord.active
+
+### SlashCommandOptions
+```ts
+interface SlashCommandOption {
+	name: string; // The name of this argument
+	description: string; // A short description of this argument
+	type: Discord.ApplicationCommandOptionType; // The type of this argument. See Discord.js docs for more info.
+	required?: boolean; // If this argument is required
+}
+```
+
+A `SlashCommandOption` is required to pass arguments to a slash command. These are used in the `SlashCommand.slashCommandOptions` property.
+
+### SlashCommandEvent
+```ts
+class SlashCommandEvent<T = any> extends CommandEvent<T> {
+	interaction?: Discord.CommandInteraction; // Interaction object that was created when the user ran the command
+}
+```
+
+A `SlashCommandEvent` is a special type of `CommandEvent` that is passed to the `run` method of a slash command. What makes it different from a `CommandEvent` is that the `message` property no longer exists. This is replaced by the `interaction` proptery instead.
+
 
 ## CommandEvent 
 
@@ -136,14 +175,17 @@ class CommandEvent<T = any> {
 	command: BotCommand; // The bot command that this event was triggered by, if its a part of a multi-command this will be the child command that gets executed
 	app: T; // This is the value that was passed into the framework on initialization
 	framework: FrameworkClient; // A reference to the framework instance
-	message: Discord.Message; // The discord message that triggered this command
-	args: string[]; // A list of arguments the user gave, split by spaces, but where anything in quotations will be grouped. hello world "hello world"
+	message: Discord.Message; // The discord message that triggered this command (Only for Text Commands)
+	args: string[]; // A list of arguments the user gave, split by spaces, but where anything in quotations will be grouped. hello world "hello world" (Only for Text Commands)
+	interaction?: Discord.Interaction //If a command is a slash command, it will give you details about the interaction (Only for Slash Commands)
 	constructor(event: CommandEvent); // If you extend the command event class then pass in the original command event to assign the values 
 }
 ```
 
 ## Argument Parsing
-
+```
+Note: This is only available for text-based commands.
+```
 To use automatic argument parsing there are some pre-requisites that must be completed first
 - `reflect-metadata` is included, and loaded before the framework
 - You are using typescript
@@ -181,6 +223,9 @@ class MyCommand{
 
 
 # Utilities
+```
+Note: Not all utilities are currently compatible with Slash commands.
+```
 
 All utilities are accessed via `framework.utils`, which will contain several utility methods
 

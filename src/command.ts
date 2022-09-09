@@ -12,6 +12,16 @@ class UserRole {
 	get type() { return this.user ? "user" : "role" }
 }
 
+/**
+ * Type for Slash Command Options.
+ */
+interface SlashCommandOption {
+	name: string;
+	description: string;
+	type: Discord.ApplicationCommandOptionType;
+	required?: boolean;
+}
+
 type BotCommandArgument = number | string | Discord.Role | Discord.User | Discord.GuildMember | UserRole;
 type BotCommandFunc = (event: CommandEvent, ...args: BotCommandArgument[]) => BotCommandReturn;
 
@@ -35,6 +45,15 @@ abstract class Command {
 	abstract run(event: CommandEvent, ...args: BotCommandArgument[]): BotCommandReturn;
 }
 
+abstract class SlashCommand extends Command {
+	slashOptions?: SlashCommandOption[]; // Slash Command Options
+	noPermError(event: CommandEvent, ...args: BotCommandArgument[]): BotCommandReturn {
+		return event.framework.error("You do not have the required permissions");
+	}
+	abstract run(event: SlashCommandEvent): BotCommandReturn;
+}
+
+
 abstract class MultiCommand extends Command {
 	subCommands: BotCommand[] = [];
 	run(event: CommandEvent) {
@@ -49,11 +68,18 @@ abstract class MultiCommand extends Command {
 	}
 }
 
+/**
+ * The event object for a command.
+ * @param command The command that was run.
+ * @param app The app.
+ * @param framework A reference to the Framework
+ * @param message The message that triggered the command.
+ */
 class CommandEvent<T = any> {
 	command: BotCommand;
 	app: T;
 	framework: FrameworkClient;
-	message: Discord.Message;
+	message?: Discord.Message;
 	args: string[];
 	constructor(frameworkOrEvent: CommandEvent)
 	constructor(frameworkOrEvent: FrameworkClient, message: Discord.Message, app: T, command: BotCommand)
@@ -72,7 +98,8 @@ class CommandEvent<T = any> {
 		this.updateCommand(this.command);
 	}
 	updateCommand(newCommand: Command) {
-		this.args = this.framework.utils.parseQuotes(this.message.content);
+		// This is now required as slash commands do not ship a message object.
+		if(this.message) this.args = this.framework.utils.parseQuotes(this.message.content);
 		// Remove non-
 		let parent = newCommand.parent;
 		let deapth = 0;
@@ -85,16 +112,34 @@ class CommandEvent<T = any> {
 	}
 }
 
+/**
+ * The event object for a SlashCommand.
+ * @param framework A reference to the Framework
+ * @param interaction The interaction that triggered the command.
+ * @param command The command that was run.
+ * @param app The app.
+ */
+class SlashCommandEvent<T = any> extends CommandEvent<T> {
+	interaction?: Discord.CommandInteraction;
+	constructor(framework: FrameworkClient, interaction: Discord.CommandInteraction, app: T, command: BotCommand) {
+		super(framework, null, app, command);
+		this.interaction = interaction;
+	}
+}
+
 type BotCommand = Command | MultiCommand;
 
 export {
 	Command,
+	SlashCommandOption,
 	MultiCommand,
 	BotCommandReturn,
 	BotCommandFunc,
 	BotCommand,
+	SlashCommand,
 	Sendable,
 	CommandEvent,
+	SlashCommandEvent,
 	BotCommandArgument,
 	UserRole
 }
