@@ -133,21 +133,38 @@ An object with the following structure
 	failMessage: Sendable; // If pass is set to false, this will be sent to the user
 }
 ```
-
 ## Slash Commands
 
 A Slash command is built right into a regular command! Most of a slash command works just like a regular command, but there are some slight differences to be aware of.
 ```ts
-abstract class Command {
-	...
-	slashCommand: Boolean = true // This has to be true to be a slash command
+abstract class Slashcommand extends Command {
+	... // All other properties are the same as a regular command
 	slashCommandOptions: SlashCommandOptions = [] // The arguments for this slash command
-	...
 }
 ```
-### The differences
 
-A regular command can be run by a text message. These commands can only be run as a slash command. You enable this option by setting `slashCommand` to `true` when creating a `Command`. They also get a slightly different `CommandEvent` object compared to a text-command. More on that below.
+Slash commands are an extention of regular commands. The major difference is that they do not work as text-based commands but can only be invoked using a `/` in Discord.active
+
+### SlashCommandOptions
+```ts
+interface SlashCommandOption {
+	name: string; // The name of this argument
+	description: string; // A short description of this argument
+	type: Discord.ApplicationCommandOptionType; // The type of this argument. See Discord.js docs for more info.
+	required?: boolean; // If this argument is required
+}
+```
+
+A `SlashCommandOption` is required to pass arguments to a slash command. These are used in the `SlashCommand.slashCommandOptions` property.
+
+### SlashCommandEvent
+```ts
+class SlashCommandEvent<T = any> extends CommandEvent<T> {
+	interaction?: Discord.CommandInteraction; // Interaction object that was created when the user ran the command
+}
+```
+
+A `SlashCommandEvent` is a special type of `CommandEvent` that is passed to the `run` method of a slash command. What makes it different from a `CommandEvent` is that the `message` property no longer exists. This is replaced by the `interaction` proptery instead.
 
 
 ## CommandEvent 
@@ -164,10 +181,6 @@ class CommandEvent<T = any> {
 	constructor(event: CommandEvent); // If you extend the command event class then pass in the original command event to assign the values 
 }
 ```
-
-### CommandEvent and Slash Commands
-
-CommandEvent has some slight changes when it comes down to a slash command. It will still send the same CommandEvent, however the `message` and `args` fields will be empty. Instead, information about this command can be found in `interaction`. 
 
 ## Argument Parsing
 ```
