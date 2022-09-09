@@ -1,13 +1,15 @@
-import { Command, CommandEvent, SlashCommandOption, Sendable } from "../../../command.js";
-declare class Slash extends Command {
+import Discord from "discord.js";
+import { SlashCommand, SlashCommandEvent } from "../../../command.js";
+declare class Slash extends SlashCommand {
     name: string;
     help: {
         msg: string;
         usage: string;
     };
     slashCommand: boolean;
-    slashOptions: SlashCommandOption[];
-    run(event: CommandEvent): Promise<void>;
-    onConfirm(event: CommandEvent): Promise<Sendable>;
+    run(event: SlashCommandEvent): Promise<{
+        embeds: Discord.MessageEmbed[];
+        ephemeral: boolean;
+    }>;
 }
 export default Slash;

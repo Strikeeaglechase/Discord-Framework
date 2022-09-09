@@ -2,11 +2,11 @@
 import "reflect-metadata";
 import "./set.js";
 
-import Discord from "discord.js";
+import Discord, { CommandInteraction } from "discord.js";
 import fs from "fs";
 
 import { ArgumentParser } from "./argumentParser.js";
-import { BotCommand, BotCommandArgument, CommandEvent, MultiCommand, Sendable, Command } from "./command.js";
+import { BotCommand, BotCommandArgument, CommandEvent, MultiCommand, Sendable, Command, SlashCommand, SlashCommandEvent } from "./command.js";
 import { ConfigManager } from "./configManager.js";
 import Database from "./database.js";
 import { defaultFrameworkOpts, EmbedOptions, FrameworkClientOptions } from "./interfaces.js";
@@ -18,7 +18,7 @@ export type MessageChannel = Discord.TextChannel | Discord.DMChannel | Discord.N
 class FrameworkClient {
 	public client: Discord.Client;
 	public botCommands: BotCommand[];
-	public slashCommands: BotCommand[];
+	public slashCommands: SlashCommand[];
 	public database: Database;
 	public permissions: PermissionManager;
 	public log: Logger;
@@ -146,7 +146,7 @@ class FrameworkClient {
 	 * @param command The command to register
 	 * @returns void
 	 */
-	private async loadSlashCommand(command: BotCommand) {
+	private async loadSlashCommand(command: SlashCommand) {
 		// Create the command data
 		const data = {
 			name: command.name,
@@ -199,21 +199,34 @@ class FrameworkClient {
 		});
 		const imported = await Promise.all(commandsImports);
 
-		// Loop over all command and verify if one of them is a slash command.
-		// If a command is one, it is moved to the slashCommands array and removed from the imported array.
-		// Then, it will register itself as a slash command.
-		imported.forEach(async element => {
-			if(element instanceof Command) {
-				if(element.slashCommand) {
-					await this.loadSlashCommand(element);
+		// We check if catTag is set. This can only happen if this function is NOT called by this.init()
+		// This check makes sure slash commands are ONLY loaded on Initialisation.
+		if(catTag == "") {
+			// Loop over all command and verify if one of them is a slash command.
+			// If a command is one, it is moved to the slashCommands array and removed from the imported array.
+			// Then, it will register itself as a slash command.
+			imported.forEach(async element => {
+				if(element instanceof Command) {
+					if(element instanceof SlashCommand) {
+						await this.loadSlashCommand(element);
 
-					// Yes, I am doing this on this and yes, this is not a good idea. It just gotta work now.
-					this.slashCommands.push(element);
-					imported.splice(imported.indexOf(element), 1);
+						// Yes, I am doing this on this and yes, this is not a good idea. It just gotta work now.
+						this.slashCommands.push(element);
+					}
 				}
-			}
 
-		});
+			});
+
+			// Clean up the slash commands from the imported array.
+			this.slashCommands.forEach(slashCommand => {
+				// Check to see if the array even contains the slash command.
+				// In regular operation it will always return true.
+				// This is just here as a failsafe in case things get funky.
+				if(imported.includes(slashCommand)){
+					imported.splice(imported.indexOf(slashCommand), 1);
+				} else this.log.error(`Slash command ${slashCommand.name} was not found in the imported array. Something went severely wrong.`);
+			})
+		}
 		return imported.filter(obj => obj != null).flat() as BotCommand[];
 	}
 	// Handles the bot being mentioned, we want to tell the user what the prefix is in case they don't know it
@@ -271,7 +284,7 @@ class FrameworkClient {
 		}
 
 		// Check if this command is actually a slash command. If it is, this needs to be aborted since it is a slash command.
-		if(command.slashCommand) {
+		if(command instanceof SlashCommand) {
 			await message.channel.send("This command is a slash command.")
 			return;
 		}
@@ -309,14 +322,18 @@ class FrameworkClient {
 	 */
 	private async handleSlashCommand(interaction: Discord.CommandInteraction) {
 		let commandName = interaction.commandName.toLowerCase();
-		let command:Command = this.slashCommands.find(cmd => cmd.name.toLowerCase() == commandName);
+		let command:SlashCommand = this.slashCommands.find(cmd => cmd.name.toLowerCase() == commandName);
 
 		// If by some weird reason a slash command is executed that is not registered, we need to abort it and send an error message.
-		if(!command) (interaction.reply({ content: "This command does not exist.", ephemeral: true }));
+		if(!command) {interaction.reply({ content: "This command does not exist.", ephemeral: true });return};
 
 		if(this.checkUserPermSlash(command, interaction)) {
-			const event = new CommandEvent(this,null, this.userApp, command, interaction);
-			await command.run(event);
+			this.log.info(`Slash Command ${command.name} executed by ${interaction.user.username}#${interaction.user.discriminator} (${interaction.user.id})`);
+			const event = new SlashCommandEvent(this,interaction,this.userApp,command);
+			const ret = await command.run(event);
+			if(ret) {
+				slashReply(interaction,ret);
+			}
 		}
 		return;
 	}
@@ -452,6 +469,26 @@ async function sendMessage(channel: MessageChannel, msg: Sendable) {
 			await channel.send({ embeds: [msg] });
 		} else {
 			await channel.send(msg);
+		}
+	}
+}
+
+/**
+ * Does exactly the same as sendMessage, except this uses the interaction.reply function instead of channel.send.
+ * @param interaction The interaction to respond to
+ * @param msg Message to send (String/Embed)
+ */
+async function slashReply(interaction:CommandInteraction,msg:Sendable) {
+	if (typeof msg == "string") {
+		while (msg.length) {
+			await interaction.reply(msg.substring(0, 2000));
+			msg = msg.substring(2000);
+		}
+	} else {
+		if (msg instanceof Discord.MessageEmbed) {
+			await interaction.reply({ embeds: [msg] });
+		} else {
+			await interaction.reply(msg);
 		}
 	}
 }

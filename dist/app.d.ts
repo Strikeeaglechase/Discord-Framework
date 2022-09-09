@@ -1,7 +1,7 @@
 import "reflect-metadata";
 import "./set.js";
 import Discord from "discord.js";
-import { BotCommand, MultiCommand, Sendable, Command } from "./command.js";
+import { BotCommand, MultiCommand, Sendable, Command, SlashCommand } from "./command.js";
 import { ConfigManager } from "./configManager.js";
 import Database from "./database.js";
 import { FrameworkClientOptions } from "./interfaces.js";
@@ -12,7 +12,7 @@ export declare type MessageChannel = Discord.TextChannel | Discord.DMChannel | D
 declare class FrameworkClient {
     client: Discord.Client;
     botCommands: BotCommand[];
-    slashCommands: BotCommand[];
+    slashCommands: SlashCommand[];
     database: Database;
     permissions: PermissionManager;
     log: Logger;

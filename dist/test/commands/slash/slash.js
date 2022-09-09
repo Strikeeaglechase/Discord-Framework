@@ -7,9 +7,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-import Discord from "discord.js";
-import { Command } from "../../../command.js";
-class Slash extends Command {
+import { SlashCommand } from "../../../command.js";
+class Slash extends SlashCommand {
     constructor() {
         super(...arguments);
         this.name = "slash";
@@ -18,32 +17,19 @@ class Slash extends Command {
             usage: "<number>",
         };
         this.slashCommand = true;
-        this.slashOptions = [
-            {
-                name: "user",
-                description: "The user to test",
-                type: "USER",
-            }
-        ]; // this can be left out, default = []
     }
+    // slashOptions:SlashCommandOption[] = [
+    //     {
+    //         name: "user",
+    //         description: "The user to test",
+    //         type: "USER",
+    //     }
+    // ]; // this can be left out, default = []
     // Run when the command is called.
     run(event) {
         return __awaiter(this, void 0, void 0, function* () {
             const { framework, interaction } = event;
-            if (!event.interaction.isCommand())
-                return; // required bc typescript funni
-            framework.utils.reactConfirm("test", interaction.channel, interaction.user.id, {
-                onConfirm: () => { return this.onConfirm(event); },
-                onCancel: () => { return "Cancelled"; }
-            });
-        });
-    }
-    // A quick onConfirm function to work with the reactConfirm function above.
-    onConfirm(event) {
-        return __awaiter(this, void 0, void 0, function* () {
-            let emb = new Discord.MessageEmbed();
-            emb.setTitle("Test");
-            return emb;
+            return framework.success("This is a success message");
         });
     }
 }

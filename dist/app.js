@@ -13,7 +13,7 @@ import "./set.js";
 import Discord from "discord.js";
 import fs from "fs";
 import { ArgumentParser } from "./argumentParser.js";
-import { CommandEvent, Command } from "./command.js";
+import { CommandEvent, Command, SlashCommand, SlashCommandEvent } from "./command.js";
 import { ConfigManager } from "./configManager.js";
 import Database from "./database.js";
 import { defaultFrameworkOpts } from "./interfaces.js";
@@ -197,19 +197,33 @@ class FrameworkClient {
                 return command;
             }));
             const imported = yield Promise.all(commandsImports);
-            // Loop over all command and verify if one of them is a slash command.
-            // If a command is one, it is moved to the slashCommands array and removed from the imported array.
-            // Then, it will register itself as a slash command.
-            imported.forEach((element) => __awaiter(this, void 0, void 0, function* () {
-                if (element instanceof Command) {
-                    if (element.slashCommand) {
-                        yield this.loadSlashCommand(element);
-                        // Yes, I am doing this on this and yes, this is not a good idea. It just gotta work now.
-                        this.slashCommands.push(element);
-                        imported.splice(imported.indexOf(element), 1);
+            // We check if catTag is set. This can only happen if this function is NOT called by this.init()
+            // This check makes sure slash commands are ONLY loaded on Initialisation.
+            if (catTag == "") {
+                // Loop over all command and verify if one of them is a slash command.
+                // If a command is one, it is moved to the slashCommands array and removed from the imported array.
+                // Then, it will register itself as a slash command.
+                imported.forEach((element) => __awaiter(this, void 0, void 0, function* () {
+                    if (element instanceof Command) {
+                        if (element instanceof SlashCommand) {
+                            yield this.loadSlashCommand(element);
+                            // Yes, I am doing this on this and yes, this is not a good idea. It just gotta work now.
+                            this.slashCommands.push(element);
+                        }
                     }
-                }
-            }));
+                }));
+                // Clean up the slash commands from the imported array.
+                this.slashCommands.forEach(slashCommand => {
+                    // Check to see if the array even contains the slash command.
+                    // In regular operation it will always return true.
+                    // This is just here as a failsafe in case things get funky.
+                    if (imported.includes(slashCommand)) {
+                        imported.splice(imported.indexOf(slashCommand), 1);
+                    }
+                    else
+                        this.log.error(`Slash command ${slashCommand.name} was not found in the imported array. Something went severely wrong.`);
+                });
+            }
             return imported.filter(obj => obj != null).flat();
         });
     }
@@ -274,7 +288,7 @@ class FrameworkClient {
                 return;
             }
             // Check if this command is actually a slash command. If it is, this needs to be aborted since it is a slash command.
-            if (command.slashCommand) {
+            if (command instanceof SlashCommand) {
                 yield message.channel.send("This command is a slash command.");
                 return;
             }
@@ -319,11 +333,18 @@ class FrameworkClient {
             let commandName = interaction.commandName.toLowerCase();
             let command = this.slashCommands.find(cmd => cmd.name.toLowerCase() == commandName);
             // If by some weird reason a slash command is executed that is not registered, we need to abort it and send an error message.
-            if (!command)
-                (interaction.reply({ content: "This command does not exist.", ephemeral: true }));
+            if (!command) {
+                interaction.reply({ content: "This command does not exist.", ephemeral: true });
+                return;
+            }
+            ;
             if (this.checkUserPermSlash(command, interaction)) {
-                const event = new CommandEvent(this, null, this.userApp, command, interaction);
-                yield command.run(event);
+                this.log.info(`Slash Command ${command.name} executed by ${interaction.user.username}#${interaction.user.discriminator} (${interaction.user.id})`);
+                const event = new SlashCommandEvent(this, interaction, this.userApp, command);
+                const ret = yield command.run(event);
+                if (ret) {
+                    slashReply(interaction, ret);
+                }
             }
             return;
         });
@@ -466,6 +487,29 @@ function sendMessage(channel, msg) {
             }
             else {
                 yield channel.send(msg);
+            }
+        }
+    });
+}
+/**
+ * Does exactly the same as sendMessage, except this uses the interaction.reply function instead of channel.send.
+ * @param interaction The interaction to respond to
+ * @param msg Message to send (String/Embed)
+ */
+function slashReply(interaction, msg) {
+    return __awaiter(this, void 0, void 0, function* () {
+        if (typeof msg == "string") {
+            while (msg.length) {
+                yield interaction.reply(msg.substring(0, 2000));
+                msg = msg.substring(2000);
+            }
+        }
+        else {
+            if (msg instanceof Discord.MessageEmbed) {
+                yield interaction.reply({ embeds: [msg] });
+            }
+            else {
+                yield interaction.reply(msg);
             }
         }
     });
