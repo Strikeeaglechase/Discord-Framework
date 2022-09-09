@@ -55,6 +55,7 @@ class FrameworkClient {
             yield this.config.init();
             yield this.permissions.init();
             yield this.botReady;
+            yield this.slashCommandCheck(); // Check to see if we need to reset slash commands.
             yield this.loadBotCommands(this.options.commandsPath);
             yield this.config.addKey("prefix", this.options.defaultPrefix);
         });
@@ -117,6 +118,19 @@ class FrameworkClient {
             this.botCommands.forEach(assignPerms);
             this.slashCommands.forEach(assignPerms);
             this.permissions.loadPerms([...perms]);
+        });
+    }
+    /**
+     * This function checks if slash commands need to be reset. If they do, it will reset them.
+     */
+    slashCommandCheck() {
+        return __awaiter(this, void 0, void 0, function* () {
+            // Check to see if we are forced to reset all slash commands.
+            // This can be useful in the event a bad command got registered and needs to be removed.
+            if (this.options.slashCommandReset) {
+                yield this.deleteSlashCommands();
+            }
+            return;
         });
     }
     /**
@@ -183,11 +197,6 @@ class FrameworkClient {
                 return command;
             }));
             const imported = yield Promise.all(commandsImports);
-            // Check to see if we are forced to reset all slash commands.
-            // This can be useful in the event a bad command got registered and needs to be removed.
-            if (this.options.slashCommandReset) {
-                yield this.deleteSlashCommands();
-            }
             // Loop over all command and verify if one of them is a slash command.
             // If a command is one, it is moved to the slashCommands array and removed from the imported array.
             // Then, it will register itself as a slash command.

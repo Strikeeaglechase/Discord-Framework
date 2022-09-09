@@ -30,6 +30,10 @@ declare class FrameworkClient {
     private initEventHandlers;
     loadBotCommands(path: string, mask?: string[]): Promise<void>;
     /**
+     * This function checks if slash commands need to be reset. If they do, it will reset them.
+     */
+    private slashCommandCheck;
+    /**
      * Load a slash command. This is a separate method from loadBotCommands because it is a different type of command.
      * @param command The command to register
      * @returns void

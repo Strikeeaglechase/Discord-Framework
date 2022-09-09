@@ -65,6 +65,7 @@ class FrameworkClient {
 		await this.config.init();
 		await this.permissions.init();
 		await this.botReady;
+		await this.slashCommandCheck(); // Check to see if we need to reset slash commands.
 		await this.loadBotCommands(this.options.commandsPath);
 		await this.config.addKey("prefix", this.options.defaultPrefix);
 	}
@@ -129,6 +130,18 @@ class FrameworkClient {
 	}
 
 	/**
+	 * This function checks if slash commands need to be reset. If they do, it will reset them.
+	 */
+	private async slashCommandCheck() {
+		// Check to see if we are forced to reset all slash commands.
+		// This can be useful in the event a bad command got registered and needs to be removed.
+		if (this.options.slashCommandReset) {
+			await this.deleteSlashCommands();
+		}
+		return;
+	}
+
+	/**
 	 * Load a slash command. This is a separate method from loadBotCommands because it is a different type of command.
 	 * @param command The command to register
 	 * @returns void
@@ -185,12 +198,6 @@ class FrameworkClient {
 			return command;
 		});
 		const imported = await Promise.all(commandsImports);
-
-		// Check to see if we are forced to reset all slash commands.
-		// This can be useful in the event a bad command got registered and needs to be removed.
-		if (this.options.slashCommandReset) {
-			await this.deleteSlashCommands();
-		}
 
 		// Loop over all command and verify if one of them is a slash command.
 		// If a command is one, it is moved to the slashCommands array and removed from the imported array.
