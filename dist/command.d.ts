@@ -9,7 +9,7 @@ declare class UserRole {
     role: Discord.Role;
     constructor(user: Discord.User, role: Discord.Role);
     get id(): string;
-    get value(): Discord.Role | Discord.User;
+    get value(): Discord.User | Discord.Role;
     get type(): "user" | "role";
 }
 /**
@@ -39,10 +39,13 @@ declare abstract class Command {
         msg?: string;
         usage?: string;
     };
-    slashCommand?: boolean;
-    slashOptions?: SlashCommandOption[];
     noPermError(event: CommandEvent, ...args: BotCommandArgument[]): BotCommandReturn;
     abstract run(event: CommandEvent, ...args: BotCommandArgument[]): BotCommandReturn;
+}
+declare abstract class SlashCommand extends Command {
+    slashOptions?: SlashCommandOption[];
+    noPermError(event: CommandEvent, ...args: BotCommandArgument[]): BotCommandReturn;
+    abstract run(event: SlashCommandEvent): BotCommandReturn;
 }
 declare abstract class MultiCommand extends Command {
     subCommands: BotCommand[];
@@ -58,8 +61,6 @@ declare abstract class MultiCommand extends Command {
  * @param app The app.
  * @param framework A reference to the Framework
  * @param message The message that triggered the command.
- * @param args The arguments for the command. [NOTE: TEXT-BASED COMMANDS ONLY]
- * @param interaction The interaction that triggered the command. [NOTE: SLASH COMMANDS ONLY]
  */
 declare class CommandEvent<T = any> {
     command: BotCommand;
@@ -67,10 +68,20 @@ declare class CommandEvent<T = any> {
     framework: FrameworkClient;
     message?: Discord.Message;
     args: string[];
-    interaction?: Discord.Interaction;
     constructor(frameworkOrEvent: CommandEvent);
-    constructor(frameworkOrEvent: FrameworkClient, message: Discord.Message, app: T, command: BotCommand, interaction?: Discord.CommandInteraction);
+    constructor(frameworkOrEvent: FrameworkClient, message: Discord.Message, app: T, command: BotCommand);
     updateCommand(newCommand: Command): void;
 }
+/**
+ * The event object for a SlashCommand.
+ * @param framework A reference to the Framework
+ * @param interaction The interaction that triggered the command.
+ * @param command The command that was run.
+ * @param app The app.
+ */
+declare class SlashCommandEvent<T = any> extends CommandEvent<T> {
+    interaction?: Discord.CommandInteraction;
+    constructor(framework: FrameworkClient, interaction: Discord.CommandInteraction, app: T, command: BotCommand);
+}
 declare type BotCommand = Command | MultiCommand;
-export { Command, SlashCommandOption, MultiCommand, BotCommandReturn, BotCommandFunc, BotCommand, Sendable, CommandEvent, BotCommandArgument, UserRole };
+export { Command, SlashCommandOption, MultiCommand, BotCommandReturn, BotCommandFunc, BotCommand, SlashCommand, Sendable, CommandEvent, SlashCommandEvent, BotCommandArgument, UserRole };

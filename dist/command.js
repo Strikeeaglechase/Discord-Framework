@@ -15,9 +15,12 @@ class Command {
         this.parent = null;
         this.altNames = [];
         this.help = {};
-        this.slashCommand = false;
-        this.slashOptions = [];
     }
+    noPermError(event, ...args) {
+        return event.framework.error("You do not have the required permissions");
+    }
+}
+class SlashCommand extends Command {
     noPermError(event, ...args) {
         return event.framework.error("You do not have the required permissions");
     }
@@ -44,11 +47,9 @@ class MultiCommand extends Command {
  * @param app The app.
  * @param framework A reference to the Framework
  * @param message The message that triggered the command.
- * @param args The arguments for the command. [NOTE: TEXT-BASED COMMANDS ONLY]
- * @param interaction The interaction that triggered the command. [NOTE: SLASH COMMANDS ONLY]
  */
 class CommandEvent {
-    constructor(frameworkOrEvent, message, app, command, interaction) {
+    constructor(frameworkOrEvent, message, app, command) {
         if (frameworkOrEvent instanceof CommandEvent) {
             this.framework = frameworkOrEvent.framework;
             this.message = frameworkOrEvent.message;
@@ -60,7 +61,6 @@ class CommandEvent {
             this.message = message;
             this.app = app;
             this.command = command;
-            this.interaction = interaction;
         }
         this.updateCommand(this.command);
     }
@@ -80,4 +80,17 @@ class CommandEvent {
         this.command = newCommand;
     }
 }
-export { Command, MultiCommand, CommandEvent, UserRole };
+/**
+ * The event object for a SlashCommand.
+ * @param framework A reference to the Framework
+ * @param interaction The interaction that triggered the command.
+ * @param command The command that was run.
+ * @param app The app.
+ */
+class SlashCommandEvent extends CommandEvent {
+    constructor(framework, interaction, app, command) {
+        super(framework, null, app, command);
+        this.interaction = interaction;
+    }
+}
+export { Command, MultiCommand, SlashCommand, CommandEvent, SlashCommandEvent, UserRole };
