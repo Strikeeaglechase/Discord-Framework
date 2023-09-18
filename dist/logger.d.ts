@@ -1,4 +1,5 @@
 /// <reference types="node" />
+/// <reference types="node" />
 import { Client } from "discord.js";
 import fs from "fs";
 import { LoggerOptions, LogLevel, LogMessage } from "./interfaces";

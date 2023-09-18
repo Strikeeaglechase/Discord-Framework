@@ -2,14 +2,13 @@
 	"compilerOptions": {
 		"experimentalDecorators": true,
 		"emitDecoratorMetadata": true,
-		"watch": true,
 		"target": "ES6",
 		"moduleResolution": "node",
 		"module": "esnext",
 		"allowSyntheticDefaultImports": true,
 		"outDir": "dist/",
 		"baseUrl": "./src",
-		"lib": ["ES2021"],
+		"lib": ["ES2021", "DOM"],
 		"declaration": true,
 	},
 	"include": ["src/"]

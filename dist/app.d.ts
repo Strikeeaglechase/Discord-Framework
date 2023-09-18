@@ -8,7 +8,7 @@ import { FrameworkClientOptions } from "./interfaces.js";
 import Logger from "./logger.js";
 import { PermissionManager } from "./permissions.js";
 import { UtilityManager } from "./util/utilManager.js";
-export declare type MessageChannel = Discord.TextChannel | Discord.DMChannel | Discord.NewsChannel | Discord.ThreadChannel | Discord.PartialDMChannel;
+export type MessageChannel = Discord.TextChannel | Discord.DMChannel | Discord.NewsChannel | Discord.ThreadChannel | Discord.PartialDMChannel;
 declare class FrameworkClient {
     client: Discord.Client;
     botCommands: BotCommand[];

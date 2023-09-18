@@ -1,13 +1,13 @@
 import Discord from "discord.js";
 import FrameworkClient, { MessageChannel } from "../app.js";
-declare type EmbedCallback = () => Discord.MessageEmbed | Promise<Discord.MessageEmbed>;
+type EmbedCallback = () => Discord.MessageEmbed | Promise<Discord.MessageEmbed>;
 interface NamedPage {
     name: string;
     description?: string;
     emoji?: string;
     get(existing: Discord.MessageEmbed, name: string): Discord.MessageEmbed | Promise<Discord.MessageEmbed>;
 }
-declare type NumberedPage = (existing: Discord.MessageEmbed, index: number) => Discord.MessageEmbed | Promise<Discord.MessageEmbed>;
+type NumberedPage = (existing: Discord.MessageEmbed, index: number) => Discord.MessageEmbed | Promise<Discord.MessageEmbed>;
 declare class PagedEmbed {
     framework: FrameworkClient;
     channel: MessageChannel;

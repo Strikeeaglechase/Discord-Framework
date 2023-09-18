@@ -4,8 +4,8 @@ declare module 'discord.js' {
         initTime?: number;
     }
 }
-declare type LogLevel = "ERROR" | "WARN" | "INFO";
-declare type LogMessage = string | Error | Object;
+type LogLevel = "ERROR" | "WARN" | "INFO";
+type LogMessage = string | Error | Object;
 interface LoggerOptions {
     logChannels?: Record<LogLevel, string>;
     logToFile: boolean;

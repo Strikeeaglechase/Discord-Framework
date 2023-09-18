@@ -11,9 +11,8 @@
 	"author": "Strikeeaglechase",
 	"license": "ISC",
 	"dependencies": {
-		"@types/mongodb": "^3.6.10",
 		"discord.js": "^13.1.0",
-		"mongodb": "^3.6.5",
+		"mongodb": "^6.1.0",
 		"reflect-metadata": "^0.1.13"
 	},
 	"devDependencies": {

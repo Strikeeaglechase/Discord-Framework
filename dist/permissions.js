@@ -18,13 +18,14 @@ class PermissionManager {
     }
     init() {
         return __awaiter(this, void 0, void 0, function* () {
-            this.permissions = yield this.framework.database.collection("permissions-new", false, "name");
+            this.permissions =
+                yield this.framework.database.collection("permissions-new", false, "name");
             this.framework.log.info(`Permission manager started`);
         });
     }
     loadPerms(permissionNames) {
         return __awaiter(this, void 0, void 0, function* () {
-            permissionNames.forEach(name => {
+            permissionNames.forEach((name) => {
                 this.paths.add(name);
             });
         });
@@ -51,7 +52,7 @@ class PermissionManager {
             const perm = yield this.getPermission(name);
             if (!perm.allow.includes(id))
                 return false;
-            perm.allow = perm.allow.filter(pid => pid != id);
+            perm.allow = perm.allow.filter((pid) => pid != id);
             yield this.permissions.update(perm, perm.name);
             return true;
         });
@@ -74,9 +75,11 @@ class PermissionManager {
             const proms = guilds.map((guild) => __awaiter(this, void 0, void 0, function* () {
                 if (this.tracks.get(userId).get(guild.id))
                     return; // If the guild flag is set, this user isnt in the server
-                const member = yield guild.members.fetch(userId).catch(() => { });
+                const member = yield guild.members
+                    .fetch(userId)
+                    .catch(() => { });
                 if (member)
-                    member.roles.cache.forEach(r => roles.push(r.id));
+                    member.roles.cache.forEach((r) => roles.push(r.id));
                 else
                     this.tracks.get(userId).set(guild.id, true); // Set guild flag
             }));
@@ -90,19 +93,19 @@ class PermissionManager {
     }
     check(userId, chain) {
         return __awaiter(this, void 0, void 0, function* () {
-            if (this.framework.overrides.some(id => id == userId))
+            if (this.framework.overrides.some((id) => id == userId))
                 return true;
             let curChain = "";
-            const itemProms = chain.split(".").map(part => {
+            const itemProms = chain.split(".").map((part) => {
                 curChain += curChain ? "." + part : part;
                 return this.getPermission(curChain);
             });
             const items = yield Promise.all(itemProms);
-            if (items.some(item => item.public))
-                return true; // If there is a public part of the chain, return true	
+            if (items.some((item) => item.public))
+                return true; // If there is a public part of the chain, return true
             const userRoles = yield this.getUserRoles(userId);
             for (let item of items) {
-                if (userRoles.some(roleId => item.allow.includes(roleId)))
+                if (userRoles.some((roleId) => item.allow.includes(roleId)))
                     return true;
             }
             return false;

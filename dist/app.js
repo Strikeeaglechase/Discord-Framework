@@ -13,10 +13,10 @@ import "./set.js";
 import Discord from "discord.js";
 import fs from "fs";
 import { ArgumentParser } from "./argumentParser.js";
-import { CommandEvent } from "./command.js";
+import { CommandEvent, } from "./command.js";
 import { ConfigManager } from "./configManager.js";
 import Database from "./database.js";
-import { defaultFrameworkOpts } from "./interfaces.js";
+import { defaultFrameworkOpts, } from "./interfaces.js";
 import Logger from "./logger.js";
 import { PermissionManager } from "./permissions.js";
 import { UtilityManager } from "./util/utilManager.js";
@@ -26,16 +26,16 @@ class FrameworkClient {
         this.options = this.loadOpts(opts);
         this.utils = new UtilityManager(this);
         this.log = new Logger(this.options.loggerOpts);
-        this.database = new Database(opts.databaseOpts, this.log);
+        this.database = new Database(opts.databaseOpts, (msg) => this.log.info(msg));
         this.permissions = new PermissionManager(this);
         this.config = new ConfigManager(this);
         ArgumentParser.instance.framework = this;
         this.botCommands = [];
         // Setup the awaitable promises
-        this.botReady = new Promise((resolve) => this.botReadyResolve = resolve);
+        this.botReady = new Promise((resolve) => (this.botReadyResolve = resolve));
     }
     loadOpts(opts) {
-        Object.keys(defaultFrameworkOpts).forEach(key => {
+        Object.keys(defaultFrameworkOpts).forEach((key) => {
             if (!opts.hasOwnProperty(key)) {
                 opts[key] = defaultFrameworkOpts[key];
             }
@@ -66,6 +66,7 @@ class FrameworkClient {
             this.botReadyResolve();
         });
         this.client.on("message", (msg) => {
+            // Using old "message" rather than "messageCreate" because djs dumb
             if (msg.author.bot)
                 return;
             msg.initTime = Date.now(); // aaaa this is bad but I like the data
@@ -90,18 +91,18 @@ class FrameworkClient {
     loadBotCommands(path, mask) {
         return __awaiter(this, void 0, void 0, function* () {
             const newCommands = yield this.fetchBotCommands(path);
-            const masked = newCommands.filter(command => {
+            const masked = newCommands.filter((command) => {
                 if (!mask)
                     return true;
-                return mask.some(maskName => command.name == maskName);
+                return mask.some((maskName) => command.name == maskName);
             });
             this.botCommands = this.botCommands.concat(masked);
             const perms = new Set();
             function assignPerms(command) {
                 command.permissions.push("command" + command.category + "." + command.name);
-                command.permissions.forEach(perm => perms.add(perm));
+                command.permissions.forEach((perm) => perms.add(perm));
                 if (isMultiCommand(command)) {
-                    command.subCommands.forEach(sc => {
+                    command.subCommands.forEach((sc) => {
                         if (sc.name != command.name)
                             assignPerms(sc);
                     });
@@ -114,15 +115,15 @@ class FrameworkClient {
     fetchBotCommands(path, catTag = "") {
         return __awaiter(this, void 0, void 0, function* () {
             const files = fs.readdirSync(path);
-            this.log.info(`Found files in ${path.substring(path.lastIndexOf('/', path.length - 2))} folder: ${files.join(", ")}`);
+            this.log.info(`Found files in ${path.substring(path.lastIndexOf("/", path.length - 2))} folder: ${files.join(", ")}`);
             const commandsImports = files.map((file) => __awaiter(this, void 0, void 0, function* () {
                 if (fs.statSync(path + file).isDirectory()) {
                     const newTag = catTag + "." + file;
                     const subcommands = yield this.fetchBotCommands(path + file + "/", newTag);
-                    const base = subcommands.find(subcommand => subcommand.name == file);
+                    const base = subcommands.find((subcommand) => subcommand.name == file);
                     if (base) {
                         base.subCommands = subcommands;
-                        subcommands.forEach(sc => {
+                        subcommands.forEach((sc) => {
                             if (sc != base)
                                 sc.parent = base;
                         });
@@ -143,7 +144,7 @@ class FrameworkClient {
                 return command;
             }));
             const imported = yield Promise.all(commandsImports);
-            return imported.filter(obj => obj != null).flat();
+            return imported.filter((obj) => obj != null).flat();
         });
     }
     // Handles the bot being mentioned, we want to tell the user what the prefix is in case they don't know it
@@ -153,10 +154,22 @@ class FrameworkClient {
                 return;
             try {
                 if (message.guild) {
-                    message.member.send({ embeds: [this.makeEmbed({ desc: `The prefix for ${message.guild.name} is \`${yield this.config.getKey(message.guild.id, "prefix")}\`` })] });
+                    message.member.send({
+                        embeds: [
+                            this.makeEmbed({
+                                desc: `The prefix for ${message.guild.name} is \`${yield this.config.getKey(message.guild.id, "prefix")}\``,
+                            }),
+                        ],
+                    });
                 }
                 else {
-                    message.member.send({ embeds: [this.makeEmbed({ desc: `The prefix for ${this.options.name} is \`${this.options.defaultPrefix}\`` })] });
+                    message.member.send({
+                        embeds: [
+                            this.makeEmbed({
+                                desc: `The prefix for ${this.options.name} is \`${this.options.defaultPrefix}\``,
+                            }),
+                        ],
+                    });
                 }
             }
             catch (e) {
@@ -179,7 +192,9 @@ class FrameworkClient {
                 .split(" ")[0]
                 .toLowerCase();
             // Resolve the prefix for the guild (need to check command was run with correct prefix)
-            const prefix = message.guild ? (yield this.config.getKey(message.guild.id, "prefix")) : this.options.defaultPrefix;
+            const prefix = message.guild
+                ? yield this.config.getKey(message.guild.id, "prefix")
+                : this.options.defaultPrefix;
             if (!message.content.startsWith(prefix)) {
                 return;
             }
@@ -191,16 +206,16 @@ class FrameworkClient {
         return __awaiter(this, void 0, void 0, function* () {
             // console.log(`CMD STR: ${commandString}`);
             const command = commandsList.find((botCommand) => {
-                const nameList = Array.isArray(botCommand.altNames) ?
-                    botCommand.altNames.concat([botCommand.name]) :
-                    [botCommand.name];
+                const nameList = Array.isArray(botCommand.altNames)
+                    ? botCommand.altNames.concat([botCommand.name])
+                    : [botCommand.name];
                 return nameList.includes(commandString);
             });
             if (!command) {
                 return;
             }
             // Make sure command can be run in a DM channel if it is in a DM
-            if ((!command.allowDM && message.channel.type == "DM")) {
+            if (!command.allowDM && message.channel.type == "DM") {
                 if (!this.options.dmErrorSilently) {
                     message.channel.send(this.error(`This command does not work in DMs, please run it in a server instead`));
                 }
@@ -213,12 +228,17 @@ class FrameworkClient {
                     return;
                 // console.log(" - " + command.name + ": " + isMultiCommand(command));
                 if (isMultiCommand(command)) {
-                    const subCommandStr = (_a = message.content.split(" ")[cmdDpth]) === null || _a === void 0 ? void 0 : _a.toLowerCase();
+                    const subCommandStr = (_a = message.content
+                        .split(" ")[cmdDpth]) === null || _a === void 0 ? void 0 : _a.toLowerCase();
                     // console.log(` - Sub cmd str: ${subCommandStr} (${command.name})`);
-                    if (!subCommandStr || subCommandStr == command.name || ((_b = command.altNames) === null || _b === void 0 ? void 0 : _b.includes(subCommandStr)))
+                    if (!subCommandStr ||
+                        subCommandStr == command.name ||
+                        ((_b = command.altNames) === null || _b === void 0 ? void 0 : _b.includes(subCommandStr)))
                         return yield this.execCommand(command, message);
                     // console.log(` - ${command.subCommands.map(c => c.name).join(", ")}`);
-                    let envt = event ? event : new CommandEvent(this, message, this.userApp, command);
+                    let envt = event
+                        ? event
+                        : new CommandEvent(this, message, this.userApp, command);
                     // envt.command = command;
                     if (command.check) {
                         const subCheck = yield command.check(envt);
@@ -241,9 +261,14 @@ class FrameworkClient {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 // Execute the command and if there is a return output it
-                const envt = event ? event : new CommandEvent(this, message, this.userApp, command);
+                const envt = event
+                    ? event
+                    : new CommandEvent(this, message, this.userApp, command);
                 // @ts-ignore
-                const args = yield ArgumentParser.instance.parseCommand(command.__proto__.constructor, envt).catch((e) => e);
+                const args = yield ArgumentParser.instance
+                    // @ts-ignore
+                    .parseCommand(command.__proto__.constructor, envt)
+                    .catch((e) => e);
                 if (args instanceof Error) {
                     message.channel.send(this.error(args.message));
                     return;
@@ -262,7 +287,8 @@ class FrameworkClient {
     }
     checkUserPerm(command, message, hideErrors = false) {
         return __awaiter(this, void 0, void 0, function* () {
-            if (command.name == "override" && message.author.id == this.options.ownerID)
+            if (command.name == "override" &&
+                message.author.id == this.options.ownerID)
                 return true;
             let hasPerm = false;
             for (let perm of command.permissions) {
@@ -314,32 +340,38 @@ class FrameworkClient {
     // Basic helper functions for returning a standard error/success value
     error(str, ephemeral = false) {
         return {
-            embeds: [this.makeEmbed({
+            embeds: [
+                this.makeEmbed({
                     title: "Error",
                     desc: str,
-                    color: "#ff0000"
-                })],
-            ephemeral: ephemeral
+                    color: "#ff0000",
+                }),
+            ],
+            ephemeral: ephemeral,
         };
     }
     success(str, ephemeral = false) {
         return {
-            embeds: [this.makeEmbed({
+            embeds: [
+                this.makeEmbed({
                     title: "Done",
                     desc: str,
-                    color: "#00ff00"
-                })],
-            ephemeral: ephemeral
+                    color: "#00ff00",
+                }),
+            ],
+            ephemeral: ephemeral,
         };
     }
     info(str, ephemeral = false) {
         return {
-            embeds: [this.makeEmbed({
+            embeds: [
+                this.makeEmbed({
                     title: "Info",
                     desc: str,
-                    color: "#0000ff"
-                })],
-            ephemeral: ephemeral
+                    color: "#0000ff",
+                }),
+            ],
+            ephemeral: ephemeral,
         };
     }
 }

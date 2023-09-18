@@ -7,7 +7,7 @@ declare enum QuestionType {
     button = 1,
     select = 2
 }
-declare type P<T> = T | Promise<T>;
+type P<T> = T | Promise<T>;
 interface BaseQuestion {
     type: QuestionType;
     handle?: (value: string) => P<{
@@ -29,8 +29,8 @@ interface ButtonQuestion extends BaseQuestion {
     type: QuestionType.button;
     options: ButtonOption[];
 }
-declare type Question = StringQuestion | SelectQuestion | ButtonQuestion;
-declare type DisplayFunc = (obj: Object, framework: FrameworkClient, message: Discord.Message) => P<Discord.MessageEmbed>;
+type Question = StringQuestion | SelectQuestion | ButtonQuestion;
+type DisplayFunc = (obj: Object, framework: FrameworkClient, message: Discord.Message) => P<Discord.MessageEmbed>;
 declare class ObjectBuilder<Obj> {
     private framework;
     private display;

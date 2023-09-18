@@ -82,8 +82,6 @@ class CollectionManager {
         });
     }
 }
-// Hehe we do a bit of casting
-// Seriously though this needs to be rethought, encoded collections are barely used, do we really need to 1:1 implement the DBStorage interface?
 class EncodedCollectionManager {
     constructor(database, collectionName, cache, idProp, encoder) {
         this.dbManager = new CollectionManager(database, collectionName, cache, idProp);

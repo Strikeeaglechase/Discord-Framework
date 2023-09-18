@@ -1,9 +1,9 @@
 import FrameworkClient from "./app.js";
 import Discord from "discord.js";
-declare type Sendable = string | Discord.MessageEmbed | {
+type Sendable = string | Discord.MessageEmbed | {
     embeds: Discord.MessageEmbed[];
 };
-declare type BotCommandReturn = Sendable | Promise<Sendable> | void | Promise<void>;
+type BotCommandReturn = Sendable | Promise<Sendable> | void | Promise<void>;
 declare class UserRole {
     user: Discord.User;
     role: Discord.Role;
@@ -12,8 +12,8 @@ declare class UserRole {
     get value(): Discord.Role | Discord.User;
     get type(): "user" | "role";
 }
-declare type BotCommandArgument = number | string | Discord.Role | Discord.User | Discord.GuildMember | UserRole;
-declare type BotCommandFunc = (event: CommandEvent, ...args: BotCommandArgument[]) => BotCommandReturn;
+type BotCommandArgument = number | string | Discord.Role | Discord.User | Discord.GuildMember | UserRole;
+type BotCommandFunc = (event: CommandEvent, ...args: BotCommandArgument[]) => BotCommandReturn;
 interface MultiCommandRet {
     pass: boolean;
     failMessage: Sendable;
@@ -51,5 +51,5 @@ declare class CommandEvent<T = any> {
     constructor(frameworkOrEvent: FrameworkClient, message: Discord.Message, app: T, command: BotCommand);
     updateCommand(newCommand: Command): void;
 }
-declare type BotCommand = Command | MultiCommand;
+type BotCommand = Command | MultiCommand;
 export { Command, MultiCommand, BotCommandReturn, BotCommandFunc, BotCommand, Sendable, CommandEvent, BotCommandArgument, UserRole };

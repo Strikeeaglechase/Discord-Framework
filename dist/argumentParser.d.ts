@@ -1,6 +1,6 @@
 import FrameworkClient from "./app.js";
 import { BotCommandArgument, Command, CommandEvent } from "./command.js";
-declare type Constructor<T> = new (...args: any[]) => T;
+type Constructor<T> = new (...args: any[]) => T;
 declare function CommandRun(target: Command, propertyKey: string, descriptor: PropertyDescriptor): void;
 declare function Arg(opts?: ArgumentOptions): (target: Command, propertyKey: string | symbol, parameterIndex: number) => void;
 interface ArgumentOptionsObject {
@@ -10,7 +10,7 @@ interface ArgumentOptionsObject {
     optional: boolean;
     regex: RegExp;
 }
-declare type ArgumentOptions = Partial<ArgumentOptionsObject> | BotCommandArgument[];
+type ArgumentOptions = Partial<ArgumentOptionsObject> | BotCommandArgument[];
 declare class ArgumentParser {
     private commandArguments;
     framework: FrameworkClient;

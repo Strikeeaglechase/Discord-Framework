@@ -1,6 +1,6 @@
 import { MessageChannel } from "../app.js";
 import { Sendable } from "../command.js";
-declare type ConfirmOptions = Partial<{
+type ConfirmOptions = Partial<{
     visual: boolean;
     onCancelMessage: Sendable;
     onConfirmMessage: Sendable;
