@@ -30,7 +30,7 @@ interface ButtonQuestion extends BaseQuestion {
     options: ButtonOption[];
 }
 type Question = StringQuestion | SelectQuestion | ButtonQuestion;
-type DisplayFunc = (obj: Object, framework: FrameworkClient, message: Discord.Message) => P<Discord.MessageEmbed>;
+type DisplayFunc = (obj: Object, framework: FrameworkClient, message: Discord.Message) => P<Discord.EmbedBuilder>;
 declare class ObjectBuilder<Obj> {
     private framework;
     private display;

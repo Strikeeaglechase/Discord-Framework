@@ -2,13 +2,13 @@
 	"compilerOptions": {
 		"experimentalDecorators": true,
 		"emitDecoratorMetadata": true,
-		"target": "ES6",
+		"target": "ES2022",
 		"moduleResolution": "node",
-		"module": "esnext",
+		"module": "es2022",
 		"allowSyntheticDefaultImports": true,
 		"outDir": "dist/",
 		"baseUrl": "./src",
-		"lib": ["ES2021", "DOM"],
+		"lib": ["ES2022"],
 		"declaration": true,
 	},
 	"include": ["src/"]

@@ -1,11 +1,11 @@
-import FrameworkClient, { MessageChannel } from "../../app.js";
-import Discord from "discord.js";
+import Discord, { ButtonStyle, TextBasedChannel } from "discord.js";
+import FrameworkClient from "../../app.js";
 interface ButtonOption {
     name: string;
     emoji?: string;
     value?: string;
     disabled?: boolean;
-    style: "PRIMARY" | "SECONDARY" | "SUCCESS" | "DANGER";
+    style: ButtonStyle.Primary | ButtonStyle.Secondary | ButtonStyle.Success | ButtonStyle.Danger;
 }
-declare function getButton(framework: FrameworkClient, channel: MessageChannel, userId: string, prompt: Discord.MessageEmbed, options: ButtonOption[]): Promise<string>;
+declare function getButton(framework: FrameworkClient, channel: TextBasedChannel, userId: string, prompt: Discord.EmbedBuilder, options: ButtonOption[]): Promise<string>;
 export { getButton, ButtonOption };

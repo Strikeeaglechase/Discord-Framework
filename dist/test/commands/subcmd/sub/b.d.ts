@@ -6,7 +6,7 @@ declare class B extends Command {
         usage: string;
     };
     run(event: CommandEvent): Promise<{
-        embeds: import("discord.js").MessageEmbed[];
+        embeds: import("discord.js").EmbedBuilder[];
         ephemeral: boolean;
     }>;
 }

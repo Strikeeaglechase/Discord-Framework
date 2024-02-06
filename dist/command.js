@@ -1,30 +1,33 @@
 class UserRole {
+    user;
+    role;
     constructor(user, role) {
         this.user = user;
         this.role = role;
     }
-    get id() { return this.value.id; }
-    get value() { return this.user ? this.user : this.role; }
-    get type() { return this.user ? "user" : "role"; }
+    get id() {
+        return this.value.id;
+    }
+    get value() {
+        return this.user ? this.user : this.role;
+    }
+    get type() {
+        return this.user ? "user" : "role";
+    }
 }
 class Command {
-    constructor() {
-        this.allowDM = true;
-        this.permissions = [];
-        this.category = null;
-        this.parent = null;
-        this.altNames = [];
-        this.help = {};
-    }
+    allowDM = true;
+    permissions = [];
+    category = null;
+    parent = null;
+    altNames = [];
+    help = {};
     noPermError(event, ...args) {
         return event.framework.error("You do not have the required permissions");
     }
 }
 class MultiCommand extends Command {
-    constructor() {
-        super(...arguments);
-        this.subCommands = [];
-    }
+    subCommands = [];
     run(event) {
         return event.framework.error(`Please specify a valid subcommand: [${this.subCommands.map(sc => sc.name).join("/")}]`);
     }
@@ -37,6 +40,11 @@ class MultiCommand extends Command {
     }
 }
 class CommandEvent {
+    command;
+    app;
+    framework;
+    message;
+    args;
     constructor(frameworkOrEvent, message, app, command) {
         if (frameworkOrEvent instanceof CommandEvent) {
             this.framework = frameworkOrEvent.framework;

@@ -5,6 +5,6 @@ declare class Ping extends Command {
     help: {
         msg: string;
     };
-    run(event: CommandEvent): Promise<Discord.MessageEmbed>;
+    run(event: CommandEvent): Promise<Discord.EmbedBuilder>;
 }
 export default Ping;

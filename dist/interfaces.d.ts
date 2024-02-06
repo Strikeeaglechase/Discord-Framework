@@ -1,5 +1,5 @@
 import { ClientOptions, ColorResolvable } from "discord.js";
-declare module 'discord.js' {
+declare module "discord.js" {
     interface Message {
         initTime?: number;
     }
@@ -35,4 +35,4 @@ interface DatabaseOptions {
     databaseName: string;
     url: string;
 }
-export { EmbedOptions, FrameworkClientOptions, defaultFrameworkOpts, DatabaseOptions, LoggerOptions, LogMessage, LogLevel, };
+export { EmbedOptions, FrameworkClientOptions, defaultFrameworkOpts, DatabaseOptions, LoggerOptions, LogMessage, LogLevel };

@@ -1,4 +1,4 @@
-import { MessageEmbed } from "discord.js";
+import { EmbedBuilder } from "discord.js";
 import { Command } from "../../../command.js";
 import { PermEvent } from "./perm.js";
 declare class PermList extends Command {
@@ -7,6 +7,6 @@ declare class PermList extends Command {
         msg: string;
         usage: string;
     };
-    run(event: PermEvent): Promise<MessageEmbed>;
+    run(event: PermEvent): Promise<EmbedBuilder>;
 }
 export default PermList;

@@ -1,7 +1,7 @@
 // This implements a level based logger that logs data to:
 // - stdout
 // - a log file split by day
-import { Client, Snowflake, TextChannel, Util } from "discord.js";
+import { Client, Snowflake, TextChannel } from "discord.js";
 import fs from "fs";
 
 // - discord channels based off severity
@@ -10,7 +10,7 @@ import { LoggerOptions, LogLevel, LogMessage } from "./interfaces";
 const path = "./logs/";
 const LOG_TIME = 1000;
 interface BufferedLogMessage {
-	level: LogLevel,
+	level: LogLevel;
 	header: string;
 	message: LogMessage;
 }
@@ -34,7 +34,7 @@ class Logger {
 		this.cb = {
 			info: this.info.bind(this),
 			warn: this.warn.bind(this),
-			error: this.error.bind(this),
+			error: this.error.bind(this)
 		};
 		this.boundLogToBot = this.logToBot.bind(this);
 		this.boundLogToBot();
@@ -44,7 +44,7 @@ class Logger {
 		this.client = client;
 		this.readyToBotLog = true;
 	}
-	// This is a loop that runs once every {LOG_TIME}ms, and is responsible for dumping the past messages into discord 
+	// This is a loop that runs once every {LOG_TIME}ms, and is responsible for dumping the past messages into discord
 	async logToBot() {
 		// If the client is not ready to be used, we just wait
 		if (!this.readyToBotLog) {
@@ -63,10 +63,12 @@ class Logger {
 		this.buffer = [];
 		for (var channelID in channelSorted) {
 			const messages = channelSorted[channelID];
-			const channel = await this.client.channels.fetch(channelID as Snowflake) as TextChannel;
+			const channel = (await this.client.channels.fetch(channelID as Snowflake)) as TextChannel;
 			const msgStrs = messages.map(msg => `\`${msg.header} ${msg.message}\``).join("\n");
-			const parts = Util.splitMessage(msgStrs);
-			for (let part of parts) await channel.send(part);
+			for (let i = 0; i < msgStrs.length; i += 2000) {
+				const part = msgStrs.substring(i, Math.min(msgStrs.length, i + 2000));
+				await channel.send(part);
+			}
 		}
 		setTimeout(this.boundLogToBot, LOG_TIME);
 	}
@@ -82,9 +84,7 @@ class Logger {
 		}
 
 		function DHeader(date: Date): string {
-			return `[${addZero(date.getDate())}/${addZero(
-				date.getMonth() + 1
-			)}]`;
+			return `[${addZero(date.getDate())}/${addZero(date.getMonth() + 1)}]`;
 		}
 		const date = new Date();
 		const t = DHeader(date) + THeader(date);
@@ -94,8 +94,7 @@ class Logger {
 	checkLogFile() {
 		if (!this.options.logToFile) return;
 		const curDate = new Date();
-		const logName = `${curDate.getMonth() + 1
-			}-${curDate.getDate()}-${curDate.getFullYear()}.txt`;
+		const logName = `${curDate.getMonth() + 1}-${curDate.getDate()}-${curDate.getFullYear()}.txt`;
 		const folderPath = this.options.filePath ? this.options.filePath : path;
 		if (logName == this.currentLogFile) return;
 		if (!fs.existsSync(folderPath)) {
@@ -109,7 +108,7 @@ class Logger {
 			console.log(`Resuming with old log file ${fullPath}`);
 		}
 		this.writeStream = fs.createWriteStream(fullPath, {
-			flags: "a",
+			flags: "a"
 		});
 		this.currentLogFile = logName;
 	}
@@ -129,7 +128,7 @@ class Logger {
 
 		console.log(formattedMessage);
 		if (this.writeStream) this.writeStream.write(formattedMessage + "\n");
-		// If a message given to the logger is not a string, we want to log the raw format of the 
+		// If a message given to the logger is not a string, we want to log the raw format of the
 		// object as well to prevent Objects such as errors from always appearing as [object Object]
 		if (typeof message != "string") {
 			// Print out raw message

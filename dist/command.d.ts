@@ -1,7 +1,9 @@
-import FrameworkClient from "./app.js";
 import Discord from "discord.js";
-type Sendable = string | Discord.MessageEmbed | {
-    embeds: Discord.MessageEmbed[];
+import FrameworkClient from "./app.js";
+type Sendable = string | Discord.Embed | {
+    embeds: Discord.Embed[];
+} | Discord.EmbedBuilder | {
+    embeds: Discord.EmbedBuilder[];
 };
 type BotCommandReturn = Sendable | Promise<Sendable> | void | Promise<void>;
 declare class UserRole {
@@ -9,7 +11,7 @@ declare class UserRole {
     role: Discord.Role;
     constructor(user: Discord.User, role: Discord.Role);
     get id(): string;
-    get value(): Discord.Role | Discord.User;
+    get value(): Discord.User | Discord.Role;
     get type(): "user" | "role";
 }
 type BotCommandArgument = number | string | Discord.Role | Discord.User | Discord.GuildMember | UserRole;
@@ -36,7 +38,7 @@ declare abstract class Command {
 declare abstract class MultiCommand extends Command {
     subCommands: BotCommand[];
     run(event: CommandEvent): {
-        embeds: Discord.MessageEmbed[];
+        embeds: Discord.EmbedBuilder[];
         ephemeral: boolean;
     };
     check(event: CommandEvent): MultiCommandRet | Promise<MultiCommandRet>;

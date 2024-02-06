@@ -1,6 +1,6 @@
 import "reflect-metadata";
 import "./set.js";
-import Discord from "discord.js";
+import Discord, { TextBasedChannel } from "discord.js";
 import { BotCommand, MultiCommand, Sendable } from "./command.js";
 import { ConfigManager } from "./configManager.js";
 import Database from "./database.js";
@@ -37,24 +37,24 @@ declare class FrameworkClient {
     private logCommand;
     private makeEmbed;
     error(str: string, ephemeral?: boolean): {
-        embeds: Discord.MessageEmbed[];
+        embeds: Discord.EmbedBuilder[];
         ephemeral: boolean;
     };
     success(str: string, ephemeral?: boolean): {
-        embeds: Discord.MessageEmbed[];
+        embeds: Discord.EmbedBuilder[];
         ephemeral: boolean;
     };
     info(str: string, ephemeral?: boolean): {
-        embeds: Discord.MessageEmbed[];
+        embeds: Discord.EmbedBuilder[];
         ephemeral: boolean;
     };
 }
 interface DiscordSendable {
     content?: string;
-    embeds?: Discord.MessageEmbedOptions[];
+    embeds?: (Discord.Embed | Discord.EmbedBuilder)[];
     ephemeral?: boolean;
 }
-declare function sendMessage(channel: MessageChannel, msg: Sendable): Promise<void>;
+declare function sendMessage(channel: TextBasedChannel, msg: Sendable): Promise<void>;
 declare function toDiscordSendable(msg: Sendable): DiscordSendable;
 declare function isMultiCommand(command: BotCommand): command is MultiCommand;
 export default FrameworkClient;

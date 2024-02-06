@@ -1,5 +1,6 @@
-import { DiscordSendable, MessageChannel, toDiscordSendable } from "../app.js";
-import Discord from "discord.js";
+import Discord, { ButtonBuilder, ButtonStyle, ComponentType, EmbedBuilder, TextBasedChannel } from "discord.js";
+
+import { DiscordSendable, toDiscordSendable } from "../app.js";
 import { Sendable } from "../command.js";
 
 type ConfirmOptions = Partial<{
@@ -10,34 +11,34 @@ type ConfirmOptions = Partial<{
 	onCancel: () => Sendable | Promise<Sendable>;
 }>;
 
-async function confirm(prompt: string, channel: MessageChannel, userId: string, opts: ConfirmOptions = {}) {
-	const emb = new Discord.MessageEmbed();
+async function confirm(prompt: string, channel: TextBasedChannel, userId: string, opts: ConfirmOptions = {}) {
+	const emb = new Discord.EmbedBuilder();
 	emb.setDescription(prompt);
 	emb.setColor("#0096ff");
 	emb.setTitle("Confirmation");
-	emb.setFooter("You have 5 minutes to respond, after which this confirmation will automatically be denied.");
-	let row = new Discord.MessageActionRow();
-	const confirm = new Discord.MessageButton({ label: "Confirm", type: "BUTTON", customId: "confirm", style: "SUCCESS" });
-	const cancel = new Discord.MessageButton({ label: "Cancel", type: "BUTTON", customId: "cancel", style: "DANGER" });
+	emb.setFooter({ text: "You have 5 minutes to respond, after which this confirmation will automatically be denied." });
+	let row = new Discord.ActionRowBuilder<ButtonBuilder>();
+	const confirm = new Discord.ButtonBuilder({ label: "Confirm", customId: "confirm", style: ButtonStyle.Success });
+	const cancel = new Discord.ButtonBuilder({ label: "Cancel", customId: "cancel", style: ButtonStyle.Danger });
 	row.addComponents(confirm, cancel);
 	const message = await channel.send({ embeds: [emb], components: [row] });
 
-	return new Promise<boolean>((res) => {
+	return new Promise<boolean>(res => {
 		const collector = message.createMessageComponentCollector({
-			componentType: "BUTTON",
+			componentType: ComponentType.Button
 		});
 		async function disable(accepted: boolean) {
 			collector.stop();
 			confirm.setDisabled(true);
 			cancel.setDisabled(true);
-			row = new Discord.MessageActionRow();
+			row = new Discord.ActionRowBuilder();
 			row.addComponents(confirm, cancel);
 			if (accepted) {
 				emb.setColor("#00ff00");
-				emb.setFooter("Action confirmed");
+				emb.setFooter({ text: "Action confirmed" });
 			} else {
 				emb.setColor("#ff0000");
-				emb.setFooter("Action canceled");
+				emb.setFooter({ text: "Action canceled" });
 			}
 			await message.edit({ embeds: [emb], components: [row] });
 		}
@@ -47,7 +48,7 @@ async function confirm(prompt: string, channel: MessageChannel, userId: string, 
 			res(false);
 		}, 1000 * 60 * 5);
 
-		collector.on("collect", async (collected) => {
+		collector.on("collect", async collected => {
 			if (collected.user.id == userId) {
 				let msgRes: DiscordSendable;
 				let conf = collected.customId == "confirm";
@@ -59,9 +60,11 @@ async function confirm(prompt: string, channel: MessageChannel, userId: string, 
 							msgRes = toDiscordSendable(await opts.onConfirm());
 						} else {
 							msgRes = {
-								embeds: [{
-									description: `\`\`\`diff\n+ Action confirmed +\`\`\``
-								}],
+								embeds: [
+									new EmbedBuilder({
+										description: `\`\`\`diff\n+ Action confirmed +\`\`\``
+									})
+								]
 							};
 						}
 						break;
@@ -72,9 +75,11 @@ async function confirm(prompt: string, channel: MessageChannel, userId: string, 
 							msgRes = toDiscordSendable(await opts.onCancel());
 						} else {
 							msgRes = {
-								embeds: [{
-									description: `\`\`\`diff\n- Action canceled -\n\`\`\``
-								}]
+								embeds: [
+									new EmbedBuilder({
+										description: `\`\`\`diff\n- Action canceled -\n\`\`\``
+									})
+								]
 							};
 						}
 						break;
@@ -84,18 +89,18 @@ async function confirm(prompt: string, channel: MessageChannel, userId: string, 
 				disable(conf);
 				res(conf);
 			} else {
-				const err = new Discord.MessageEmbed({
+				const err = new Discord.EmbedBuilder({
 					title: "Error",
-					color: "#ff0000",
+					color: 0xff0000,
 					description: "```diff\n- This command was not run by you. -\n```"
 				});
 				collected.reply({ embeds: [err], ephemeral: true });
 			}
 		});
-		collector.on("end", (reason) => {
+		collector.on("end", reason => {
 			clearTimeout(timeout);
-		})
+		});
 	});
 }
 export default confirm;
-export { ConfirmOptions }
+export { ConfirmOptions };

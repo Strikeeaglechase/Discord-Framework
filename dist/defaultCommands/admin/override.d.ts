@@ -5,7 +5,7 @@ declare class Override extends Command {
         msg: string;
     };
     run(event: CommandEvent): {
-        embeds: import("discord.js").MessageEmbed[];
+        embeds: import("discord.js").EmbedBuilder[];
         ephemeral: boolean;
     };
 }

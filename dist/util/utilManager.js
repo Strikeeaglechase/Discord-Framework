@@ -1,15 +1,16 @@
 import Discord from "discord.js";
+import { getButtonSelect } from "./buttonSelects.js";
 import utilDisplayId from "./dispalyID.js";
+import { getButton } from "./inputs/getButton.js";
+import { getDropdown } from "./inputs/getDropdown.js";
+import { getString } from "./inputs/getString.js";
+import { ObjectBuilder } from "./objectBuilder.js";
 import { NamedPageEmbed, NumberedPageEmbed } from "./pagedEmbed.js";
 import utilParseQuotes from "./parseQuotes.js";
 import utilReactConfirm from "./reactConfirm.js";
 import utilResolveUser from "./resolveUser.js";
-import { getString } from "./inputs/getString.js";
-import { getDropdown } from "./inputs/getDropdown.js";
-import { getButton } from "./inputs/getButton.js";
-import { ObjectBuilder } from "./objectBuilder.js";
-import { getButtonSelect } from "./buttonSelects.js";
 class UtilityManager {
+    framework;
     constructor(framework) {
         this.framework = framework;
     }
@@ -23,7 +24,6 @@ class UtilityManager {
         return utilParseQuotes(str);
     }
     reactConfirm(prompt, messageOrChannel, userIdOrOpts, opts) {
-        // console.log(prompt, messageOrChannel, userIdOrOpts, opts);
         if (messageOrChannel instanceof Discord.Message && (typeof userIdOrOpts == "object" || typeof userIdOrOpts == "undefined")) {
             return utilReactConfirm(prompt, messageOrChannel.channel, messageOrChannel.author.id, userIdOrOpts);
         }

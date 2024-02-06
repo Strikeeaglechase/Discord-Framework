@@ -6,7 +6,7 @@ declare class Eval extends Command {
         msg: string;
     };
     run(event: CommandEvent): Promise<string | {
-        embeds: Discord.MessageEmbed[];
+        embeds: Discord.EmbedBuilder[];
         ephemeral: boolean;
     }>;
 }

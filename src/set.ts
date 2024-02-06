@@ -16,9 +16,10 @@ Set.prototype.filter = function filter<T>(this: Set<T>, f: (item: T) => boolean)
 	for (var v of this) if (f(v)) newSet.add(v);
 	return newSet;
 };
+
 Set.prototype.array = function array<T>(this: Set<T>) {
 	return [...this];
-}
+};
 
 // Set.prototype.every = function every(f) {
 // 	for (var v of this) if (!f(v)) return false;
@@ -29,4 +30,4 @@ Set.prototype.array = function array<T>(this: Set<T>) {
 // 	for (var v of this) if (f(v)) return true;
 // 	return false;
 // };
-export { };
+export {};

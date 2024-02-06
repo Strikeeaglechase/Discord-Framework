@@ -1,6 +1,7 @@
-import { ClientOptions, ColorResolvable, Intents, IntentsString } from "discord.js";
+import { ClientOptions, ColorResolvable, IntentsBitField, Partials } from "discord.js";
+
 // import Discord from "discord.js";
-declare module 'discord.js' {
+declare module "discord.js" {
 	interface Message {
 		initTime?: number;
 	}
@@ -35,6 +36,7 @@ interface FrameworkClientOptions {
 	dmErrorSilently?: boolean;
 	clientOptions?: ClientOptions;
 }
+const f = IntentsBitField.Flags;
 const defaultFrameworkOpts: Partial<FrameworkClientOptions> = {
 	loggerOpts: {
 		logToFile: false
@@ -44,22 +46,35 @@ const defaultFrameworkOpts: Partial<FrameworkClientOptions> = {
 	dmErrorSilently: false,
 	permErrorSilently: false,
 	clientOptions: {
-		intents: Object.keys(Intents.FLAGS) as IntentsString[],
-		partials: ["CHANNEL"]
-	},
-}
+		intents:
+			f.Guilds |
+			f.GuildMembers |
+			f.GuildModeration |
+			f.GuildEmojisAndStickers |
+			f.GuildIntegrations |
+			f.GuildWebhooks |
+			f.GuildInvites |
+			f.GuildVoiceStates |
+			f.GuildPresences |
+			f.GuildMessages |
+			f.GuildMessageReactions |
+			f.GuildMessageTyping |
+			f.DirectMessages |
+			f.DirectMessageReactions |
+			f.DirectMessages |
+			f.DirectMessageReactions |
+			f.DirectMessageTyping |
+			f.MessageContent |
+			f.GuildScheduledEvents |
+			f.AutoModerationConfiguration |
+			f.AutoModerationExecution,
+		partials: [Partials.Channel]
+	}
+};
 
 interface DatabaseOptions {
 	databaseName: string;
 	url: string;
 }
 
-export {
-	EmbedOptions,
-	FrameworkClientOptions,
-	defaultFrameworkOpts,
-	DatabaseOptions,
-	LoggerOptions,
-	LogMessage,
-	LogLevel,
-}
+export { EmbedOptions, FrameworkClientOptions, defaultFrameworkOpts, DatabaseOptions, LoggerOptions, LogMessage, LogLevel };

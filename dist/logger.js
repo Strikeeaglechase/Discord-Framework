@@ -1,20 +1,15 @@
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-// This implements a level based logger that logs data to:
-// - stdout
-// - a log file split by day
-import { Util } from "discord.js";
 import fs from "fs";
 const path = "./logs/";
 const LOG_TIME = 1000;
 class Logger {
+    options;
+    buffer;
+    writeStream;
+    currentLogFile;
+    client;
+    readyToBotLog;
+    boundLogToBot;
+    cb;
     constructor(opts) {
         this.options = opts;
         this.buffer = [];
@@ -22,7 +17,7 @@ class Logger {
         this.cb = {
             info: this.info.bind(this),
             warn: this.warn.bind(this),
-            error: this.error.bind(this),
+            error: this.error.bind(this)
         };
         this.boundLogToBot = this.logToBot.bind(this);
         this.boundLogToBot();
@@ -32,35 +27,34 @@ class Logger {
         this.client = client;
         this.readyToBotLog = true;
     }
-    // This is a loop that runs once every {LOG_TIME}ms, and is responsible for dumping the past messages into discord 
-    logToBot() {
-        return __awaiter(this, void 0, void 0, function* () {
-            // If the client is not ready to be used, we just wait
-            if (!this.readyToBotLog) {
-                return setTimeout(this.boundLogToBot, LOG_TIME);
+    // This is a loop that runs once every {LOG_TIME}ms, and is responsible for dumping the past messages into discord
+    async logToBot() {
+        // If the client is not ready to be used, we just wait
+        if (!this.readyToBotLog) {
+            return setTimeout(this.boundLogToBot, LOG_TIME);
+        }
+        // Loop through all buffered messages and organize them by channel
+        const channelSorted = {};
+        this.buffer.forEach(message => {
+            const channelID = this.options.logChannels[message.level];
+            if (channelID) {
+                if (!channelSorted[channelID])
+                    channelSorted[channelID] = [];
+                channelSorted[channelID].push(message);
             }
-            // Loop through all buffered messages and organize them by channel
-            const channelSorted = {};
-            this.buffer.forEach(message => {
-                const channelID = this.options.logChannels[message.level];
-                if (channelID) {
-                    if (!channelSorted[channelID])
-                        channelSorted[channelID] = [];
-                    channelSorted[channelID].push(message);
-                }
-            });
-            // Loop through each channel and send the messages as a single joined block
-            this.buffer = [];
-            for (var channelID in channelSorted) {
-                const messages = channelSorted[channelID];
-                const channel = yield this.client.channels.fetch(channelID);
-                const msgStrs = messages.map(msg => `\`${msg.header} ${msg.message}\``).join("\n");
-                const parts = Util.splitMessage(msgStrs);
-                for (let part of parts)
-                    yield channel.send(part);
-            }
-            setTimeout(this.boundLogToBot, LOG_TIME);
         });
+        // Loop through each channel and send the messages as a single joined block
+        this.buffer = [];
+        for (var channelID in channelSorted) {
+            const messages = channelSorted[channelID];
+            const channel = (await this.client.channels.fetch(channelID));
+            const msgStrs = messages.map(msg => `\`${msg.header} ${msg.message}\``).join("\n");
+            for (let i = 0; i < msgStrs.length; i += 2000) {
+                const part = msgStrs.substring(i, Math.min(msgStrs.length, i + 2000));
+                await channel.send(part);
+            }
+        }
+        setTimeout(this.boundLogToBot, LOG_TIME);
     }
     // Genorates the [time/date] header all logs have
     getDateHeader() {
@@ -99,7 +93,7 @@ class Logger {
             console.log(`Resuming with old log file ${fullPath}`);
         }
         this.writeStream = fs.createWriteStream(fullPath, {
-            flags: "a",
+            flags: "a"
         });
         this.currentLogFile = logName;
     }
@@ -118,7 +112,7 @@ class Logger {
         console.log(formattedMessage);
         if (this.writeStream)
             this.writeStream.write(formattedMessage + "\n");
-        // If a message given to the logger is not a string, we want to log the raw format of the 
+        // If a message given to the logger is not a string, we want to log the raw format of the
         // object as well to prevent Objects such as errors from always appearing as [object Object]
         if (typeof message != "string") {
             // Print out raw message

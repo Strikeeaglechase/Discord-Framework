@@ -1,15 +1,22 @@
-import FrameworkClient from "./app.js";
 import Discord from "discord.js";
 
-type Sendable = string | Discord.MessageEmbed | { embeds: Discord.MessageEmbed[] };
+import FrameworkClient from "./app.js";
+
+type Sendable = string | Discord.Embed | { embeds: Discord.Embed[] } | Discord.EmbedBuilder | { embeds: Discord.EmbedBuilder[] };
 
 type BotCommandReturn = Sendable | Promise<Sendable> | void | Promise<void>;
 
 class UserRole {
-	constructor(public user: Discord.User, public role: Discord.Role) { }
-	get id() { return this.value.id }
-	get value() { return this.user ? this.user : this.role }
-	get type() { return this.user ? "user" : "role" }
+	constructor(public user: Discord.User, public role: Discord.Role) {}
+	get id() {
+		return this.value.id;
+	}
+	get value() {
+		return this.user ? this.user : this.role;
+	}
+	get type() {
+		return this.user ? "user" : "role";
+	}
 }
 
 type BotCommandArgument = number | string | Discord.Role | Discord.User | Discord.GuildMember | UserRole;
@@ -28,7 +35,7 @@ abstract class Command {
 	category: string = null;
 	parent: BotCommand = null;
 	altNames: string[] = [];
-	help: { msg?: string; usage?: string; } = {}
+	help: { msg?: string; usage?: string } = {};
 	noPermError(event: CommandEvent, ...args: BotCommandArgument[]): BotCommandReturn {
 		return event.framework.error("You do not have the required permissions");
 	}
@@ -45,7 +52,7 @@ abstract class MultiCommand extends Command {
 			event: event,
 			pass: true,
 			failMessage: ""
-		}
+		};
 	}
 }
 
@@ -55,8 +62,8 @@ class CommandEvent<T = any> {
 	framework: FrameworkClient;
 	message: Discord.Message;
 	args: string[];
-	constructor(frameworkOrEvent: CommandEvent)
-	constructor(frameworkOrEvent: FrameworkClient, message: Discord.Message, app: T, command: BotCommand)
+	constructor(frameworkOrEvent: CommandEvent);
+	constructor(frameworkOrEvent: FrameworkClient, message: Discord.Message, app: T, command: BotCommand);
 	constructor(frameworkOrEvent: FrameworkClient | CommandEvent, message?: Discord.Message, app?: T, command?: BotCommand) {
 		if (frameworkOrEvent instanceof CommandEvent) {
 			this.framework = frameworkOrEvent.framework;
@@ -87,14 +94,4 @@ class CommandEvent<T = any> {
 
 type BotCommand = Command | MultiCommand;
 
-export {
-	Command,
-	MultiCommand,
-	BotCommandReturn,
-	BotCommandFunc,
-	BotCommand,
-	Sendable,
-	CommandEvent,
-	BotCommandArgument,
-	UserRole
-}
+export { Command, MultiCommand, BotCommandReturn, BotCommandFunc, BotCommand, Sendable, CommandEvent, BotCommandArgument, UserRole };

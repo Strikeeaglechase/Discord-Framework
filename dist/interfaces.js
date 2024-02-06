@@ -1,4 +1,5 @@
-import { Intents } from "discord.js";
+import { IntentsBitField, Partials } from "discord.js";
+const f = IntentsBitField.Flags;
 const defaultFrameworkOpts = {
     loggerOpts: {
         logToFile: false
@@ -8,8 +9,28 @@ const defaultFrameworkOpts = {
     dmErrorSilently: false,
     permErrorSilently: false,
     clientOptions: {
-        intents: Object.keys(Intents.FLAGS),
-        partials: ["CHANNEL"]
-    },
+        intents: f.Guilds |
+            f.GuildMembers |
+            f.GuildModeration |
+            f.GuildEmojisAndStickers |
+            f.GuildIntegrations |
+            f.GuildWebhooks |
+            f.GuildInvites |
+            f.GuildVoiceStates |
+            f.GuildPresences |
+            f.GuildMessages |
+            f.GuildMessageReactions |
+            f.GuildMessageTyping |
+            f.DirectMessages |
+            f.DirectMessageReactions |
+            f.DirectMessages |
+            f.DirectMessageReactions |
+            f.DirectMessageTyping |
+            f.MessageContent |
+            f.GuildScheduledEvents |
+            f.AutoModerationConfiguration |
+            f.AutoModerationExecution,
+        partials: [Partials.Channel]
+    }
 };
-export { defaultFrameworkOpts, };
+export { defaultFrameworkOpts };

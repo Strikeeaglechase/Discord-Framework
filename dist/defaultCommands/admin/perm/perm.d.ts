@@ -10,7 +10,7 @@ declare class Perm extends MultiCommand {
         event: PermEvent<any>;
         pass: boolean;
         failMessage: {
-            embeds: import("discord.js").MessageEmbed[];
+            embeds: import("discord.js").EmbedBuilder[];
             ephemeral: boolean;
         };
     }>;

@@ -7,11 +7,11 @@ import { BotCommand, Command, CommandEvent } from "../../command.js";
 class Help extends Command {
 	name = "help";
 	help = {
-		msg: "Show this help message",
+		msg: "Show this help message"
 	};
 	async run(event: CommandEvent) {
 		const { message, framework } = event;
-		const prefix = message.guild ? (await framework.config.getKey(message.guild.id, "prefix")) : framework.options.defaultPrefix;
+		const prefix = message.guild ? await framework.config.getKey(message.guild.id, "prefix") : framework.options.defaultPrefix;
 		const allCommands: Set<BotCommand> = new Set();
 		const catagories: Record<string, Set<BotCommand>> = {};
 		async function getAllBotCommands(commands: BotCommand[]) {
@@ -31,10 +31,9 @@ class Help extends Command {
 			await Promise.all(proms);
 		}
 		await getAllBotCommands(framework.botCommands);
-		const handleNewHelpSelect = (emb: Discord.MessageEmbed, name: string) => {
+		const handleNewHelpSelect = (emb: Discord.EmbedBuilder, name: string) => {
 			const commands = catagories[name];
 			emb.setTitle(`**Help for ${name}**`);
-			emb.fields = [];
 			commands.forEach(command => {
 				const idx = command.category.lastIndexOf(".");
 				// let prename = command.category.substring(idx + 1, command.category.length);
@@ -50,17 +49,27 @@ class Help extends Command {
 				if (!(command.parent && isMultiCommand(command.parent))) prename = "";
 				if (prename.length > 0) prename += " ";
 				if (!command.help.usage && command.help.msg) {
-					emb.addField(`${prefix}${prename}${command.name} ${command.help.msg}`, `\u200E`);
+					emb.addFields([
+						{
+							name: `${prefix}${prename}${command.name} ${command.help.msg}`,
+							value: `\u200E`
+						}
+					]);
 				} else if (command.help.msg) {
-					emb.addField(`${prefix}${prename}${command.name} ${command.help.usage}`, command.help.msg);
+					emb.addFields([
+						{
+							name: `${prefix}${prename}${command.name} ${command.help.usage}`,
+							value: command.help.msg
+						}
+					]);
 				}
 			});
 			return emb;
 		};
 		framework.utils.namedPageEmbed(
 			message,
-			() => new Discord.MessageEmbed({ title: "Help selection", description: "Selected the help section you would like to view" }),
-			() => new Discord.MessageEmbed({ title: "Loading" }),
+			() => new Discord.EmbedBuilder({ title: "Help selection", description: "Selected the help section you would like to view" }),
+			() => new Discord.EmbedBuilder({ title: "Loading" }),
 			Object.keys(catagories).map(category => {
 				return {
 					name: category,
@@ -69,5 +78,5 @@ class Help extends Command {
 			})
 		);
 	}
-};
+}
 export default Help;

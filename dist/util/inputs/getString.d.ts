@@ -1,4 +1,3 @@
-import { MessageChannel } from "../../app.js";
-import Discord from "discord.js";
-declare function getString(channel: MessageChannel, userId: string, prompt: Discord.MessageEmbed): Promise<string>;
+import Discord, { TextBasedChannel } from "discord.js";
+declare function getString(channel: TextBasedChannel, userId: string, prompt: Discord.EmbedBuilder): Promise<string>;
 export { getString };

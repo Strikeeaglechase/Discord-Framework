@@ -7,7 +7,7 @@ declare class Prefix extends Command {
         usage: string;
     };
     run(event: CommandEvent, newPrefix: string): Promise<{
-        embeds: import("discord.js").MessageEmbed[];
+        embeds: import("discord.js").EmbedBuilder[];
         ephemeral: boolean;
     }>;
 }

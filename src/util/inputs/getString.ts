@@ -1,21 +1,20 @@
-import { MessageChannel } from "../../app.js";
-import Discord from "discord.js";
+import Discord, { TextBasedChannel } from "discord.js";
 
-async function getString(channel: MessageChannel, userId: string, prompt: Discord.MessageEmbed) {
-	prompt.setFooter("You have 5 minutes to reply.");
+async function getString(channel: TextBasedChannel, userId: string, prompt: Discord.EmbedBuilder) {
+	prompt.setFooter({ text: "You have 5 minutes to reply." });
 	const message = await channel.send({ embeds: [prompt] });
 	const collector = channel.createMessageCollector({
-		filter: (m) => m.author.id == userId,
+		filter: m => m.author.id == userId,
 		max: 1,
 		time: 5 * 1000 * 60
 	});
-	const prom = new Promise<string>((res) => {
+	const prom = new Promise<string>(res => {
 		let value = "";
-		collector.on("collect", (m) => {
+		collector.on("collect", m => {
 			value = m.content;
 		});
 		collector.on("end", async () => {
-			prompt.setFooter(`Response collected`);
+			prompt.setFooter({ text: `Response collected` });
 			await message.edit({ embeds: [prompt] });
 			res(value);
 		});
