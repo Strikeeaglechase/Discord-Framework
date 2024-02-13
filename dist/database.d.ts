@@ -11,7 +11,7 @@ declare class Database {
     options: DatabaseOptions;
     constructor(opts: DatabaseOptions, log: Logger);
     init(): Promise<boolean>;
-    collection<T, IDType extends string = string>(collectionName: string, useCache: boolean, idProp: string): Promise<CollectionManager<T, IDType>>;
+    collection<T, X extends keyof T, IDType extends string = string>(collectionName: string, useCache: boolean, idProp: X): Promise<CollectionManager<T, IDType>>;
     encodedCollection<DataType, SerializedData, IDType extends string = string>(collectionName: string, useCache: boolean, idProp: string, encoder: Encoder<DataType, SerializedData>): Promise<EncodedCollectionManager<DataType, SerializedData, IDType>>;
 }
 export default Database;

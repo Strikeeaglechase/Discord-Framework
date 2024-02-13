@@ -1,6 +1,6 @@
 import MongoDBPkg from "mongodb";
 import { CollectionManager, EncodedCollectionManager } from "./collectionManager.js";
-const { MongoClient, } = MongoDBPkg;
+const { MongoClient } = MongoDBPkg;
 class Database {
     db;
     log;
@@ -26,8 +26,8 @@ class Database {
     }
     // Creates a new collection manager and returns it
     async collection(collectionName, useCache, idProp) {
-        this.log(`Initializing collection manager for ${collectionName}. Caching: ${useCache}, ID Property: ${idProp}`);
-        const newCollection = new CollectionManager(this, collectionName, useCache, idProp);
+        this.log(`Initializing collection manager for ${collectionName}. Caching: ${useCache}, ID Property: ${String(idProp)}`);
+        const newCollection = new CollectionManager(this, collectionName, useCache, String(idProp));
         await newCollection.init();
         this.log(`Init finished, ${newCollection.collection.collectionName} and ${newCollection.archive.collectionName} are ready to be used`);
         return newCollection;

@@ -7,9 +7,7 @@ interface DatabaseOptions {
 	databaseName: string;
 	url: string;
 }
-const {
-	MongoClient,
-} = MongoDBPkg;
+const { MongoClient } = MongoDBPkg;
 
 type Logger = (msg: string) => void;
 
@@ -38,9 +36,13 @@ class Database {
 	}
 
 	// Creates a new collection manager and returns it
-	async collection<T, IDType extends string = string>(collectionName: string, useCache: boolean, idProp: string): Promise<CollectionManager<T, IDType>> {
-		this.log(`Initializing collection manager for ${collectionName}. Caching: ${useCache}, ID Property: ${idProp}`);
-		const newCollection = new CollectionManager<T, IDType>(this, collectionName, useCache, idProp);
+	async collection<T, X extends keyof T, IDType extends string = string>(
+		collectionName: string,
+		useCache: boolean,
+		idProp: X
+	): Promise<CollectionManager<T, IDType>> {
+		this.log(`Initializing collection manager for ${collectionName}. Caching: ${useCache}, ID Property: ${String(idProp)}`);
+		const newCollection = new CollectionManager<T, IDType>(this, collectionName, useCache, String(idProp));
 		await newCollection.init();
 		this.log(`Init finished, ${newCollection.collection.collectionName} and ${newCollection.archive.collectionName} are ready to be used`);
 		return newCollection;
@@ -55,7 +57,9 @@ class Database {
 		this.log(`Initializing encoded collection manager for ${collectionName}. Caching: ${useCache}, ID Property: ${idProp},`);
 		const newCollection = new EncodedCollectionManager<DataType, SerializedData, IDType>(this, collectionName, useCache, idProp, encoder);
 		await newCollection.init();
-		this.log(`Init finished, ${newCollection.dbManager.collection.collectionName} and ${newCollection.dbManager.archive.collectionName} are ready to be used`);
+		this.log(
+			`Init finished, ${newCollection.dbManager.collection.collectionName} and ${newCollection.dbManager.archive.collectionName} are ready to be used`
+		);
 		return newCollection;
 	}
 }

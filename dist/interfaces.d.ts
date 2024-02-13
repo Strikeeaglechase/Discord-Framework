@@ -29,6 +29,7 @@ interface FrameworkClientOptions {
     permErrorSilently?: boolean;
     dmErrorSilently?: boolean;
     clientOptions?: ClientOptions;
+    slashCommandDevServer?: string;
 }
 declare const defaultFrameworkOpts: Partial<FrameworkClientOptions>;
 interface DatabaseOptions {

@@ -35,6 +35,7 @@ interface FrameworkClientOptions {
 	permErrorSilently?: boolean;
 	dmErrorSilently?: boolean;
 	clientOptions?: ClientOptions;
+	slashCommandDevServer?: string;
 }
 const f = IntentsBitField.Flags;
 const defaultFrameworkOpts: Partial<FrameworkClientOptions> = {

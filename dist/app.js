@@ -1,7 +1,7 @@
 // This file is the main entry point for my custom framework wrapper around discord.js
 import "reflect-metadata";
 import "./set.js";
-import Discord, { ChannelType } from "discord.js";
+import Discord, { ChannelType, InteractionType } from "discord.js";
 import fs from "fs";
 import { ArgumentParser } from "./argumentParser.js";
 import { CommandEvent } from "./command.js";
@@ -10,13 +10,17 @@ import Database from "./database.js";
 import { defaultFrameworkOpts } from "./interfaces.js";
 import Logger from "./logger.js";
 import { PermissionManager } from "./permissions.js";
+import { SlashCommand, SlashCommandEvent, SlashCommandParent } from "./slashCommand.js";
+import { SlashCommandArgumentParser } from "./slashCommandArgumentParser.js";
 import { UtilityManager } from "./util/utilManager.js";
 class FrameworkClient {
     client;
-    botCommands;
+    botCommands = [];
+    slashCommands = [];
     database;
     permissions;
     log;
+    dynamicMessages;
     // These "ready" promises are awaitables to allow methods to wait for something to be ready to be used
     dbReady;
     botReady;
@@ -35,7 +39,6 @@ class FrameworkClient {
         this.permissions = new PermissionManager(this);
         this.config = new ConfigManager(this);
         ArgumentParser.instance.framework = this;
-        this.botCommands = [];
         // Setup the awaitable promises
         this.botReady = new Promise(resolve => (this.botReadyResolve = resolve));
     }
@@ -59,7 +62,9 @@ class FrameworkClient {
         await this.permissions.init();
         await this.botReady;
         await this.loadBotCommands(this.options.commandsPath);
+        await this.finalizeSlashCommands();
         await this.config.addKey("prefix", this.options.defaultPrefix);
+        this.dynamicMessages = await this.database.collection("dynamic-messages", false, "messageId");
     }
     // Sets up all the event handlers the framework listens to
     initEventHandlers() {
@@ -87,6 +92,11 @@ class FrameworkClient {
         });
         this.client.on("guildMemberAdd", member => {
             this.permissions.clearUserTracks(member.id);
+        });
+        this.client.on("interactionCreate", itr => {
+            if (itr.type == InteractionType.ApplicationCommand) {
+                this.handleSlashCommand(itr);
+            }
         });
     }
     // Gets the files in whatever path points to, and iterates over all the js files to be loaded as commands
@@ -139,12 +149,66 @@ class FrameworkClient {
                 return null;
             }
             const imported = await import("file://" + path + file);
+            if (typeof imported.default != "function") {
+                this.log.error(`Unable to import command from ${path + file}, default export is not a class`);
+                return null;
+            }
             const command = new imported.default();
+            // Slash commands don't register as a typical command
+            if (command instanceof SlashCommandParent) {
+                this.loadSlashCommand(command, path + file);
+                return null;
+            }
             command.category = catTag;
             return command;
         });
         const imported = await Promise.all(commandsImports);
         return imported.filter(obj => obj != null).flat();
+    }
+    loadSlashCommand(command, filepath) {
+        this.log.info(`Loading slash command ${command.name}`);
+        const sourceFilePath = filepath
+            .split("")
+            .reverse()
+            .join("")
+            .replaceAll("\\", "/")
+            .replace("/tsid/", "/crs/")
+            .split("")
+            .reverse()
+            .join("")
+            .replace(".js", ".ts");
+        this.log.info(`Registering slash command from source file ${sourceFilePath}`);
+        SlashCommandArgumentParser.registerCommandFromSourceFile(command, sourceFilePath);
+        this.slashCommands.push(command);
+    }
+    async finalizeSlashCommands() {
+        // Assign subcommands to their parent commands
+        this.slashCommands.forEach(command => {
+            const sc = command.getSubCommands();
+            sc.forEach(subCommandCtor => {
+                const subCommand = this.slashCommands.find(c => c.constructor == subCommandCtor);
+                if (!subCommand) {
+                    this.log.error(`Subcommand ${subCommandCtor.name} for command ${command.name} not found`);
+                    return;
+                }
+                else {
+                    if (!(subCommand instanceof SlashCommand))
+                        throw new Error(`Subcommand ${subCommandCtor.name} is not an instance of SlashCommand`);
+                    subCommand._isSubcommand = true;
+                    command._subCommands.push(subCommand);
+                    subCommand._parent = command;
+                }
+            });
+        });
+        const slashCommands = this.slashCommands
+            .map(command => {
+            return SlashCommandArgumentParser.buildSlashCommand(command, this.slashCommands);
+        })
+            .filter(sc => sc != null);
+        this.log.info(`Registering ${slashCommands.length} slash commands`);
+        const devGuild = await this.client.guilds.fetch(this.options.slashCommandDevServer);
+        await devGuild.commands.set(slashCommands);
+        this.log.info(`Registered slash commands in ${devGuild.name} (${devGuild.id})`);
     }
     // Handles the bot being mentioned, we want to tell the user what the prefix is in case they don't know it
     async handleMention(message) {
@@ -171,6 +235,37 @@ class FrameworkClient {
             }
         }
         catch (e) {
+            this.log.error(e);
+        }
+    }
+    async handleSlashCommand(interaction) {
+        let command = this.slashCommands.find(command => command.name == interaction.commandName);
+        if (command.getSubCommands().length > 0) {
+            // Resolve the subcommand
+            const subCommand = command._subCommands.find(subCommand => subCommand.name == interaction.options.data[0].name);
+            if (!subCommand) {
+                this.log.error(`Subcommand ${interaction.options.data[0].name} for command ${command.name} not found`);
+                return;
+            }
+            command = subCommand;
+        }
+        if (!command) {
+            this.log.error(`Slash command ${interaction.commandName} was not found`);
+            return;
+        }
+        try {
+            if (!(command instanceof SlashCommand))
+                throw new Error(`Command ${command.name} is not an instance of SlashCommand`);
+            const interactionEvent = new SlashCommandEvent(this, interaction, this.userApp, command);
+            const args = SlashCommandArgumentParser.layoutArguments(command, interaction.options.data);
+            const rArgs = [interactionEvent, ...args.slice(1)];
+            const reply = await command.run.apply(command, rArgs);
+            if (reply) {
+                await interaction.reply(toDiscordSendable(reply));
+            }
+        }
+        catch (e) {
+            this.log.error(`Error running slash command ${command.name}`);
             this.log.error(e);
         }
     }

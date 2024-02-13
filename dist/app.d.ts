@@ -1,20 +1,25 @@
 import "reflect-metadata";
 import "./set.js";
 import Discord, { TextBasedChannel } from "discord.js";
+import { CollectionManager } from "./collectionManager.js";
 import { BotCommand, MultiCommand, Sendable } from "./command.js";
 import { ConfigManager } from "./configManager.js";
 import Database from "./database.js";
+import { DynamicMessageRef } from "./dynamicMessage.js";
 import { FrameworkClientOptions } from "./interfaces.js";
 import Logger from "./logger.js";
 import { PermissionManager } from "./permissions.js";
+import { SlashCommandParent } from "./slashCommand.js";
 import { UtilityManager } from "./util/utilManager.js";
 export type MessageChannel = Discord.TextChannel | Discord.DMChannel | Discord.NewsChannel | Discord.ThreadChannel | Discord.PartialDMChannel;
 declare class FrameworkClient {
     client: Discord.Client;
     botCommands: BotCommand[];
+    slashCommands: SlashCommandParent[];
     database: Database;
     permissions: PermissionManager;
     log: Logger;
+    dynamicMessages: CollectionManager<DynamicMessageRef<unknown>>;
     dbReady: Promise<void>;
     botReady: Promise<void>;
     utils: UtilityManager;
@@ -29,7 +34,10 @@ declare class FrameworkClient {
     private initEventHandlers;
     loadBotCommands(path: string, mask?: string[]): Promise<void>;
     private fetchBotCommands;
+    private loadSlashCommand;
+    private finalizeSlashCommands;
     private handleMention;
+    private handleSlashCommand;
     private handleMessage;
     private handleCommand;
     private execCommand;
