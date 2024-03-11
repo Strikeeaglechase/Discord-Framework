@@ -151,7 +151,7 @@ class SlashCommandArgumentParser {
 		if (!(command instanceof SlashCommand)) return;
 		const content = fs.readFileSync(file, "utf-8");
 
-		const match = [...content.matchAll(/class [\w\d]+ extends [\w\W]+run\(([\w\W]*)\)(: ?[\w\W]+)? ?{/g)];
+		const match = [...content.matchAll(/class [\w\d]+ extends [\w\W]+run\(([\w\W]*?)\)(: ?[\w\W]+)? ?{/g)];
 		const runArgs = [...match][0][1];
 		const argNameAndType = runArgs.matchAll(/(@SArg\([\w\W]*?\))? ?((?:[\w\d]+)|(?:{[\w\W]+?})): ([\w\d]+)/g);
 
