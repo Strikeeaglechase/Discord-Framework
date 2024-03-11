@@ -102,6 +102,8 @@ class FrameworkClient {
 		this.client.on("interactionCreate", itr => {
 			if (itr.type == InteractionType.ApplicationCommand) {
 				this.handleSlashCommand(itr);
+			} else if (itr.isAutocomplete()) {
+				this.handleAutocomplete(itr);
 			}
 		});
 	}
@@ -272,6 +274,17 @@ class FrameworkClient {
 			this.log.error(`Error running slash command ${command.name}`);
 			this.log.error(e);
 		}
+	}
+	private async handleAutocomplete(interaction: Discord.AutocompleteInteraction) {
+		const command = this.slashCommands.find(command => command.name == interaction.commandName);
+		if (!command) {
+			this.log.error(`Slash command ${interaction.commandName} was not found`);
+			return;
+		}
+
+		if (!(command instanceof SlashCommand)) throw new Error(`Command ${command.name} is not an instance of SlashCommand`);
+
+		command.handleAutocomplete(interaction);
 	}
 	// Primary message handler that executes commands
 	private async handleMessage(message: Discord.Message) {

@@ -97,6 +97,9 @@ class FrameworkClient {
             if (itr.type == InteractionType.ApplicationCommand) {
                 this.handleSlashCommand(itr);
             }
+            else if (itr.isAutocomplete()) {
+                this.handleAutocomplete(itr);
+            }
         });
     }
     // Gets the files in whatever path points to, and iterates over all the js files to be loaded as commands
@@ -268,6 +271,16 @@ class FrameworkClient {
             this.log.error(`Error running slash command ${command.name}`);
             this.log.error(e);
         }
+    }
+    async handleAutocomplete(interaction) {
+        const command = this.slashCommands.find(command => command.name == interaction.commandName);
+        if (!command) {
+            this.log.error(`Slash command ${interaction.commandName} was not found`);
+            return;
+        }
+        if (!(command instanceof SlashCommand))
+            throw new Error(`Command ${command.name} is not an instance of SlashCommand`);
+        command.handleAutocomplete(interaction);
     }
     // Primary message handler that executes commands
     async handleMessage(message) {

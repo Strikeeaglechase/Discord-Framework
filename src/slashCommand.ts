@@ -1,4 +1,4 @@
-import { CommandInteraction, Embed, EmbedBuilder, PermissionsBitField } from "discord.js";
+import { AutocompleteInteraction, CommandInteraction, Embed, EmbedBuilder, PermissionsBitField } from "discord.js";
 
 import FrameworkClient from "./app.js";
 import { SlashCommandArgumentType } from "./slashCommandArgumentParser.js";
@@ -43,7 +43,9 @@ abstract class SlashCommand extends SlashCommandParent {
 		return [];
 	}
 
-	// public handleAutocomplete(event: )
+	public handleAutocomplete(event: AutocompleteInteraction) {
+		throw new Error("Autocomplete not implemented for this command");
+	}
 }
 
 export { SlashCommand, SlashCommandParent, SlashCommandEvent, Constructor };

@@ -1,4 +1,4 @@
-import { CommandInteraction, Embed, EmbedBuilder } from "discord.js";
+import { AutocompleteInteraction, CommandInteraction, Embed, EmbedBuilder } from "discord.js";
 import FrameworkClient from "./app.js";
 import { SlashCommandArgumentType } from "./slashCommandArgumentParser.js";
 type Sendable = string | Embed | {
@@ -29,5 +29,6 @@ declare abstract class SlashCommandParent {
 declare abstract class SlashCommand extends SlashCommandParent {
     abstract run(event: SlashCommandEvent, ...args: SlashCommandArgumentType[]): BotCommandReturn;
     getSubCommands(): Constructor<SlashCommand>[];
+    handleAutocomplete(event: AutocompleteInteraction): void;
 }
 export { SlashCommand, SlashCommandParent, SlashCommandEvent, Constructor };

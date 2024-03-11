@@ -23,5 +23,8 @@ class SlashCommand extends SlashCommandParent {
     getSubCommands() {
         return [];
     }
+    handleAutocomplete(event) {
+        throw new Error("Autocomplete not implemented for this command");
+    }
 }
 export { SlashCommand, SlashCommandParent, SlashCommandEvent };

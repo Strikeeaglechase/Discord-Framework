@@ -38,6 +38,7 @@ declare class FrameworkClient {
     private finalizeSlashCommands;
     private handleMention;
     private handleSlashCommand;
+    private handleAutocomplete;
     private handleMessage;
     private handleCommand;
     private execCommand;
