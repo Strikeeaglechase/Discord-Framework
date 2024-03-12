@@ -15,6 +15,13 @@ declare class SlashCommandEvent<T = any> {
     interaction: CommandInteraction;
     constructor(framework: FrameworkClient, interaction: CommandInteraction, app: T, command: SlashCommand);
 }
+declare class SlashCommandAutocompleteEvent<T = any> {
+    command: SlashCommand;
+    app: T;
+    framework: FrameworkClient;
+    interaction: AutocompleteInteraction;
+    constructor(framework: FrameworkClient, interaction: AutocompleteInteraction, app: T, command: SlashCommand);
+}
 declare abstract class SlashCommandParent {
     abstract name: string;
     abstract description: string;
@@ -29,6 +36,6 @@ declare abstract class SlashCommandParent {
 declare abstract class SlashCommand extends SlashCommandParent {
     abstract run(event: SlashCommandEvent, ...args: SlashCommandArgumentType[]): BotCommandReturn;
     getSubCommands(): Constructor<SlashCommand>[];
-    handleAutocomplete(event: AutocompleteInteraction): void;
+    handleAutocomplete(event: SlashCommandAutocompleteEvent): void;
 }
-export { SlashCommand, SlashCommandParent, SlashCommandEvent, Constructor };
+export { SlashCommand, SlashCommandParent, SlashCommandEvent, Constructor, SlashCommandAutocompleteEvent };

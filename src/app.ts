@@ -14,7 +14,7 @@ import { DynamicMessageRef } from "./dynamicMessage.js";
 import { defaultFrameworkOpts, EmbedOptions, FrameworkClientOptions } from "./interfaces.js";
 import Logger from "./logger.js";
 import { PermissionManager } from "./permissions.js";
-import { SlashCommand, SlashCommandEvent, SlashCommandParent } from "./slashCommand.js";
+import { SlashCommand, SlashCommandAutocompleteEvent, SlashCommandEvent, SlashCommandParent } from "./slashCommand.js";
 import { SlashCommandArgumentParser } from "./slashCommandArgumentParser.js";
 import { UtilityManager } from "./util/utilManager.js";
 
@@ -284,7 +284,8 @@ class FrameworkClient {
 
 		if (!(command instanceof SlashCommand)) throw new Error(`Command ${command.name} is not an instance of SlashCommand`);
 
-		command.handleAutocomplete(interaction);
+		const event = new SlashCommandAutocompleteEvent(this, interaction, this.userApp, command);
+		command.handleAutocomplete(event);
 	}
 	// Primary message handler that executes commands
 	private async handleMessage(message: Discord.Message) {

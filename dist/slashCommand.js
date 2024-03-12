@@ -11,6 +11,18 @@ class SlashCommandEvent {
         this.command = command;
     }
 }
+class SlashCommandAutocompleteEvent {
+    command;
+    app;
+    framework;
+    interaction;
+    constructor(framework, interaction, app, command) {
+        this.framework = framework;
+        this.interaction = interaction;
+        this.app = app;
+        this.command = command;
+    }
+}
 class SlashCommandParent {
     allowDm = true;
     nsfw = false;
@@ -27,4 +39,4 @@ class SlashCommand extends SlashCommandParent {
         throw new Error("Autocomplete not implemented for this command");
     }
 }
-export { SlashCommand, SlashCommandParent, SlashCommandEvent };
+export { SlashCommand, SlashCommandParent, SlashCommandEvent, SlashCommandAutocompleteEvent };

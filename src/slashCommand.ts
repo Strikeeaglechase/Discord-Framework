@@ -22,6 +22,20 @@ class SlashCommandEvent<T = any> {
 	}
 }
 
+class SlashCommandAutocompleteEvent<T = any> {
+	public command: SlashCommand;
+	public app: T;
+	public framework: FrameworkClient;
+	public interaction: AutocompleteInteraction;
+
+	constructor(framework: FrameworkClient, interaction: AutocompleteInteraction, app: T, command: SlashCommand) {
+		this.framework = framework;
+		this.interaction = interaction;
+		this.app = app;
+		this.command = command;
+	}
+}
+
 abstract class SlashCommandParent {
 	public abstract name: string;
 	public abstract description: string;
@@ -43,9 +57,9 @@ abstract class SlashCommand extends SlashCommandParent {
 		return [];
 	}
 
-	public handleAutocomplete(event: AutocompleteInteraction) {
+	public handleAutocomplete(event: SlashCommandAutocompleteEvent) {
 		throw new Error("Autocomplete not implemented for this command");
 	}
 }
 
-export { SlashCommand, SlashCommandParent, SlashCommandEvent, Constructor };
+export { SlashCommand, SlashCommandParent, SlashCommandEvent, Constructor, SlashCommandAutocompleteEvent };
