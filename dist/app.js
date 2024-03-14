@@ -273,7 +273,16 @@ class FrameworkClient {
         }
     }
     async handleAutocomplete(interaction) {
-        const command = this.slashCommands.find(command => command.name == interaction.commandName);
+        let command = this.slashCommands.find(command => command.name == interaction.commandName);
+        if (command.getSubCommands().length > 0) {
+            // Resolve the subcommand
+            const subCommand = command._subCommands.find(subCommand => subCommand.name == interaction.options.data[0].name);
+            if (!subCommand) {
+                this.log.error(`Subcommand ${interaction.options.data[0].name} for command ${command.name} not found`);
+                return;
+            }
+            command = subCommand;
+        }
         if (!command) {
             this.log.error(`Slash command ${interaction.commandName} was not found`);
             return;
