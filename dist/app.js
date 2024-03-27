@@ -242,7 +242,7 @@ class FrameworkClient {
         }
     }
     async handleSlashCommand(interaction) {
-        let command = this.slashCommands.find(command => command.name == interaction.commandName);
+        let command = this.slashCommands.find(command => command.name == interaction.commandName && !command._isSubcommand);
         if (command.getSubCommands().length > 0) {
             // Resolve the subcommand
             const subCommand = command._subCommands.find(subCommand => subCommand.name == interaction.options.data[0].name);
