@@ -1,7 +1,7 @@
 import { ApplicationCommandOptionType, SlashCommandBuilder, SlashCommandSubcommandBuilder } from "discord.js";
 import fs from "fs";
 import { SlashCommand } from "./slashCommand.js";
-const validTypeNames = ["string", "number", "boolean", "User", "TextBasedChannel", "Attachment"];
+const validTypeNames = ["string", "number", "boolean", "User", "TextBasedChannel", "Attachment", "Role"];
 // Convert string like "replyTwiceIDFor" into "Reply Twice ID For"
 function parseDevName(str) {
     let output = "";
@@ -164,6 +164,9 @@ class SlashCommandArgumentParser {
                 case ApplicationCommandOptionType.Attachment:
                     value = arg.attachment;
                     break;
+                case ApplicationCommandOptionType.Role:
+                    value = arg.role;
+                    break;
                 default:
                     throw new Error(`Invalid argument type from interaction ${arg.type}`);
             }
@@ -219,6 +222,9 @@ class SlashCommandArgumentParser {
                 break;
             case "Attachment":
                 target.addChannelOption(opt => fill(opt));
+                break;
+            case "Role":
+                target.addRoleOption(opt => fill(opt));
                 break;
             default:
                 throw new Error(`Invalid argument type ${argument.type}`);

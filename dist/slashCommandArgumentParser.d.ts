@@ -1,6 +1,6 @@
-import { Attachment, Channel, CommandInteractionOption, SlashCommandBuilder, User } from "discord.js";
+import { Attachment, Channel, CommandInteractionOption, Role, SlashCommandBuilder, User } from "discord.js";
 import { SlashCommand, SlashCommandParent } from "./slashCommand.js";
-type SlashCommandArgumentType = string | number | boolean | User | Channel | Attachment;
+type SlashCommandArgumentType = string | number | boolean | User | Channel | Attachment | Role;
 interface ArgumentOptions {
     choices?: {
         name: string;

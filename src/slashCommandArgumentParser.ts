@@ -4,6 +4,7 @@ import {
 	Attachment,
 	Channel,
 	CommandInteractionOption,
+	Role,
 	SlashCommandBuilder,
 	SlashCommandSubcommandBuilder,
 	TextBasedChannel,
@@ -13,8 +14,8 @@ import fs from "fs";
 
 import { Constructor, SlashCommand, SlashCommandParent } from "./slashCommand.js";
 
-type SlashCommandArgumentType = string | number | boolean | User | Channel | Attachment;
-const validTypeNames: string[] = ["string", "number", "boolean", "User", "TextBasedChannel", "Attachment"];
+type SlashCommandArgumentType = string | number | boolean | User | Channel | Attachment | Role;
+const validTypeNames: string[] = ["string", "number", "boolean", "User", "TextBasedChannel", "Attachment", "Role"];
 
 // Convert string like "replyTwiceIDFor" into "Reply Twice ID For"
 function parseDevName(str: string): string {
@@ -212,6 +213,9 @@ class SlashCommandArgumentParser {
 				case ApplicationCommandOptionType.Attachment:
 					value = arg.attachment;
 					break;
+				case ApplicationCommandOptionType.Role:
+					value = arg.role as Role;
+					break;
 				default:
 					throw new Error(`Invalid argument type from interaction ${arg.type}`);
 			}
@@ -269,6 +273,9 @@ class SlashCommandArgumentParser {
 				break;
 			case "Attachment":
 				target.addChannelOption(opt => fill(opt));
+				break;
+			case "Role":
+				target.addRoleOption(opt => fill(opt));
 				break;
 			default:
 				throw new Error(`Invalid argument type ${argument.type}`);
