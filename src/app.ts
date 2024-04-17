@@ -214,9 +214,13 @@ class FrameworkClient {
 			.filter(sc => sc != null);
 		this.log.info(`Registering ${slashCommands.length} slash commands`);
 
-		const devGuild = await this.client.guilds.fetch(this.options.slashCommandDevServer);
-		await devGuild.commands.set(slashCommands);
-		this.log.info(`Registered slash commands in ${devGuild.name} (${devGuild.id})`);
+		if (this.options.slashCommandDevServer) {
+			const devGuild = await this.client.guilds.fetch(this.options.slashCommandDevServer);
+			await devGuild.commands.set(slashCommands);
+			this.log.info(`Registered slash commands in ${devGuild.name} (${devGuild.id})`);
+		} else {
+			this.log.info(`No dev guild set, skipping slash command set`);
+		}
 	}
 
 	// Handles the bot being mentioned, we want to tell the user what the prefix is in case they don't know it

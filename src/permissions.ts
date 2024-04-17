@@ -21,16 +21,11 @@ class PermissionManager {
 		return [...this.paths];
 	}
 	public async init() {
-		this.permissions =
-			await this.framework.database.collection<PermissionEntry>(
-				"permissions-new",
-				false,
-				"name"
-			);
+		this.permissions = await this.framework.database.collection("permissions-new", false, "name");
 		this.framework.log.info(`Permission manager started`);
 	}
 	public async loadPerms(permissionNames: string[]) {
-		permissionNames.forEach((name) => {
+		permissionNames.forEach(name => {
 			this.paths.add(name);
 		});
 	}
@@ -49,7 +44,7 @@ class PermissionManager {
 	public async remove(name: string, id: string) {
 		const perm = await this.getPermission(name);
 		if (!perm.allow.includes(id)) return false;
-		perm.allow = perm.allow.filter((pid) => pid != id);
+		perm.allow = perm.allow.filter(pid => pid != id);
 		await this.permissions.update(perm, perm.name);
 		return true;
 	}
@@ -64,12 +59,10 @@ class PermissionManager {
 		}
 		const guilds = this.framework.client.guilds.cache;
 		const roles: string[] = [];
-		const proms = guilds.map(async (guild) => {
+		const proms = guilds.map(async guild => {
 			if (this.tracks.get(userId).get(guild.id)) return; // If the guild flag is set, this user isnt in the server
-			const member = await guild.members
-				.fetch(userId as Discord.Snowflake)
-				.catch(() => {});
-			if (member) member.roles.cache.forEach((r) => roles.push(r.id));
+			const member = await guild.members.fetch(userId as Discord.Snowflake).catch(() => {});
+			if (member) member.roles.cache.forEach(r => roles.push(r.id));
 			else this.tracks.get(userId).set(guild.id, true); // Set guild flag
 		});
 		await Promise.all(proms);
@@ -80,18 +73,17 @@ class PermissionManager {
 		this.tracks.set(userId, new Map());
 	}
 	public async check(userId: string, chain: string): Promise<boolean> {
-		if (this.framework.overrides.some((id) => id == userId)) return true;
+		if (this.framework.overrides.some(id => id == userId)) return true;
 		let curChain = "";
-		const itemProms = chain.split(".").map((part) => {
+		const itemProms = chain.split(".").map(part => {
 			curChain += curChain ? "." + part : part;
 			return this.getPermission(curChain);
 		});
 		const items = await Promise.all(itemProms);
-		if (items.some((item) => item.public)) return true; // If there is a public part of the chain, return true
+		if (items.some(item => item.public)) return true; // If there is a public part of the chain, return true
 		const userRoles = await this.getUserRoles(userId);
 		for (let item of items) {
-			if (userRoles.some((roleId) => item.allow.includes(roleId)))
-				return true;
+			if (userRoles.some(roleId => item.allow.includes(roleId))) return true;
 		}
 		return false;
 	}
