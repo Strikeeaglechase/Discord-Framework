@@ -12,9 +12,10 @@ const { MongoClient } = MongoDBPkg;
 type Logger = (msg: string) => void;
 
 class Database {
-	db: MongoDBPkg.Db;
-	log: Logger;
-	options: DatabaseOptions;
+	public db: MongoDBPkg.Db;
+	public log: Logger;
+	public options: DatabaseOptions;
+	public client: MongoDBPkg.MongoClient;
 	constructor(opts: DatabaseOptions, log: Logger) {
 		this.log = log;
 		this.options = opts;
@@ -24,8 +25,8 @@ class Database {
 	async init(): Promise<boolean> {
 		this.log("Database init started");
 		try {
-			const client = await MongoClient.connect(this.options.url);
-			this.db = client.db(this.options.databaseName);
+			this.client = await MongoClient.connect(this.options.url);
+			this.db = this.client.db(this.options.databaseName);
 			this.log("Database client connected");
 			return true;
 		} catch (e) {

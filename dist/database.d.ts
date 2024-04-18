@@ -9,6 +9,7 @@ declare class Database {
     db: MongoDBPkg.Db;
     log: Logger;
     options: DatabaseOptions;
+    client: MongoDBPkg.MongoClient;
     constructor(opts: DatabaseOptions, log: Logger);
     init(): Promise<boolean>;
     collection<T, X extends keyof T, IDType extends string = string>(collectionName: string, useCache: boolean, idProp: X): Promise<CollectionManager<T, IDType>>;

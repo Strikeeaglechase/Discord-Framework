@@ -5,6 +5,7 @@ class Database {
     db;
     log;
     options;
+    client;
     constructor(opts, log) {
         this.log = log;
         this.options = opts;
@@ -13,8 +14,8 @@ class Database {
     async init() {
         this.log("Database init started");
         try {
-            const client = await MongoClient.connect(this.options.url);
-            this.db = client.db(this.options.databaseName);
+            this.client = await MongoClient.connect(this.options.url);
+            this.db = this.client.db(this.options.databaseName);
             this.log("Database client connected");
             return true;
         }
