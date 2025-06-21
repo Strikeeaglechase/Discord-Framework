@@ -1,6 +1,6 @@
 {
 	"name": "strike-discord-framework",
-	"version": "1.5.8",
+	"version": "1.5.10",
 	"description": "A simple lightweight framework meant to allow rapid development of discord bots",
 	"main": "dist/app.js",
 	"type": "module",

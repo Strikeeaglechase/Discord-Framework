@@ -2,7 +2,7 @@
 import "reflect-metadata";
 import "./set.js";
 
-import Discord, { ChannelType, InteractionType, TextBasedChannel } from "discord.js";
+import Discord, { ChannelType, TextBasedChannel } from "discord.js";
 import fs from "fs";
 
 import { ArgumentParser } from "./argumentParser.js";
@@ -100,7 +100,7 @@ class FrameworkClient {
 			this.permissions.clearUserTracks(member.id);
 		});
 		this.client.on("interactionCreate", itr => {
-			if (itr.type == InteractionType.ApplicationCommand) {
+			if (itr.isChatInputCommand()) {
 				this.handleSlashCommand(itr);
 			} else if (itr.isAutocomplete()) {
 				this.handleAutocomplete(itr);

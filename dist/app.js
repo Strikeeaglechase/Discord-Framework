@@ -1,7 +1,7 @@
 // This file is the main entry point for my custom framework wrapper around discord.js
 import "reflect-metadata";
 import "./set.js";
-import Discord, { ChannelType, InteractionType } from "discord.js";
+import Discord, { ChannelType } from "discord.js";
 import fs from "fs";
 import { ArgumentParser } from "./argumentParser.js";
 import { CommandEvent } from "./command.js";
@@ -94,7 +94,7 @@ class FrameworkClient {
             this.permissions.clearUserTracks(member.id);
         });
         this.client.on("interactionCreate", itr => {
-            if (itr.type == InteractionType.ApplicationCommand) {
+            if (itr.isChatInputCommand()) {
                 this.handleSlashCommand(itr);
             }
             else if (itr.isAutocomplete()) {
