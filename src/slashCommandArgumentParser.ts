@@ -272,7 +272,7 @@ class SlashCommandArgumentParser {
 				target.addChannelOption(opt => fill(opt));
 				break;
 			case "Attachment":
-				target.addChannelOption(opt => fill(opt));
+				target.addAttachmentOption(opt => fill(opt));
 				break;
 			case "Role":
 				target.addRoleOption(opt => fill(opt));
