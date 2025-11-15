@@ -1,5 +1,6 @@
 import { ApplicationCommandOptionType, SlashCommandBuilder, SlashCommandSubcommandBuilder } from "discord.js";
 import fs from "fs";
+import path from "path";
 import { SlashCommand } from "./slashCommand.js";
 const validTypeNames = ["string", "number", "boolean", "User", "TextBasedChannel", "Attachment", "Role"];
 // Convert string like "replyTwiceIDFor" into "Reply Twice ID For"
@@ -108,7 +109,7 @@ class SlashCommandArgumentParser {
         const argNameAndType = runArgs.matchAll(/(@SArg\([\w\W]*?\))? ?((?:[\w\d]+)|(?:{[\w\W]+?})): ([\w\d]+)/g);
         const commandArguments = this.commands.get(command.constructor);
         if (!commandArguments) {
-            throw new Error(`Unable to find arguments for command ${command.name}`);
+            throw new Error(`Processing command ${path.basename(file)} - Unable to find arguments for command ${command.name}`);
         }
         [...argNameAndType].forEach((arg, idx) => {
             const [_, sArg, name, type] = arg;
@@ -116,17 +117,17 @@ class SlashCommandArgumentParser {
                 return;
             if (idx == 0) {
                 if (type != "SlashCommandEvent")
-                    throw new Error("First argument must be of type SlashCommandEvent");
+                    throw new Error("Processing command ${path.basename(file)} - First argument must be of type SlashCommandEvent");
                 return;
             }
             let rType = type.includes(".") ? type.split(".")[1] : type;
             const isValidType = validTypeNames.includes(rType);
             if (!isValidType) {
-                throw new Error(`Invalid type ${rType} (${type}) for argument ${name}`);
+                throw new Error(`Processing command ${path.basename(file)} - Invalid type ${rType} (${type}) for argument ${name}`);
             }
             const argDef = commandArguments.args.find(a => a.paramIndex == idx);
             if (!argDef)
-                throw new Error(`Unable to find argument definition for ${name}`);
+                throw new Error(`Processing command ${path.basename(file)} - Unable to find argument definition for ${name}`);
             argDef.type = type;
             if (argDef.name == "")
                 argDef.name = name.toLowerCase();

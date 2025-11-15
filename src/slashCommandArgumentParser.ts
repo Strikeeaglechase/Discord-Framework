@@ -11,6 +11,7 @@ import {
 	User
 } from "discord.js";
 import fs from "fs";
+import path from "path";
 
 import { Constructor, SlashCommand, SlashCommandParent } from "./slashCommand.js";
 
@@ -158,25 +159,25 @@ class SlashCommandArgumentParser {
 
 		const commandArguments = this.commands.get(command.constructor as Constructor<SlashCommand>);
 		if (!commandArguments) {
-			throw new Error(`Unable to find arguments for command ${command.name}`);
+			throw new Error(`Processing command ${path.basename(file)} - Unable to find arguments for command ${command.name}`);
 		}
 
 		[...argNameAndType].forEach((arg, idx) => {
 			const [_, sArg, name, type] = arg;
 			if (name.trim().startsWith("{")) return;
 			if (idx == 0) {
-				if (type != "SlashCommandEvent") throw new Error("First argument must be of type SlashCommandEvent");
+				if (type != "SlashCommandEvent") throw new Error("Processing command ${path.basename(file)} - First argument must be of type SlashCommandEvent");
 				return;
 			}
 
 			let rType = type.includes(".") ? type.split(".")[1] : type;
 			const isValidType = validTypeNames.includes(rType);
 			if (!isValidType) {
-				throw new Error(`Invalid type ${rType} (${type}) for argument ${name}`);
+				throw new Error(`Processing command ${path.basename(file)} - Invalid type ${rType} (${type}) for argument ${name}`);
 			}
 
 			const argDef = commandArguments.args.find(a => a.paramIndex == idx);
-			if (!argDef) throw new Error(`Unable to find argument definition for ${name}`);
+			if (!argDef) throw new Error(`Processing command ${path.basename(file)} - Unable to find argument definition for ${name}`);
 			argDef.type = type;
 			if (argDef.name == "") argDef.name = name.toLowerCase();
 		});
