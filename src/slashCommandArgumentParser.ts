@@ -153,7 +153,7 @@ class SlashCommandArgumentParser {
 		if (!(command instanceof SlashCommand)) return;
 		const content = fs.readFileSync(file, "utf-8");
 
-		const match = [...content.matchAll(/class [\w\d]+ extends [\w\W]+run\(([\w\W]*?)\)(: ?[\w\W]+)? ?{/g)];
+		const match = [...content.matchAll(/class [\w\d]+ extends [\w\W]+?run\(([\w\W]*?)\)(: ?[\w\W]+)? ?{/g)];
 		const runArgs = [...match][0][1];
 		const argNameAndType = runArgs.matchAll(/(@SArg\([\w\W]*?\))? ?((?:[\w\d]+)|(?:{[\w\W]+?})): ([\w\d]+)/g);
 
@@ -166,7 +166,7 @@ class SlashCommandArgumentParser {
 			const [_, sArg, name, type] = arg;
 			if (name.trim().startsWith("{")) return;
 			if (idx == 0) {
-				if (type != "SlashCommandEvent") throw new Error("Processing command ${path.basename(file)} - First argument must be of type SlashCommandEvent");
+				if (type != "SlashCommandEvent") throw new Error(`Processing command ${path.basename(file)} - First argument must be of type SlashCommandEvent`);
 				return;
 			}
 
